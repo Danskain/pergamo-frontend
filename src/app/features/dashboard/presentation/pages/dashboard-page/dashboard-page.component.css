@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+.dashboard-page {
+  display: grid;
+  gap: 1rem;
+}
+
+.pillars-title {
+  margin: 0 0 1rem;
+}
+
+.pillars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.pillar {
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(51, 102, 255, 0.12);
+  font-size: 0.875rem;
+  font-weight: 600;
+}

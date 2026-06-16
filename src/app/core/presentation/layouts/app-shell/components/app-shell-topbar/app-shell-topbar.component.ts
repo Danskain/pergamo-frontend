@@ -1,0 +1,72 @@
+import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
+import {
+  NbBadgeModule,
+  NbButtonModule,
+  NbIconModule,
+  NbSearchModule,
+  NbThemeService,
+  NbToggleModule,
+  NbUserModule
+} from '@nebular/theme';
+
+type AppTheme = 'default' | 'dark';
+
+@Component({
+  selector: 'app-shell-topbar',
+  imports: [
+    NbBadgeModule,
+    NbButtonModule,
+    NbIconModule,
+    NbSearchModule,
+    NbToggleModule,
+    NbUserModule
+  ],
+  templateUrl: './app-shell-topbar.component.html',
+  styleUrl: './app-shell-topbar.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class AppShellTopbarComponent {
+  private readonly themeService = inject(NbThemeService);
+
+  readonly appName = input.required<string>();
+  readonly menuToggle = output<void>();
+  protected readonly notificationCount = 3;
+  protected readonly userName = 'Usuario Demo';
+  protected readonly userTitle = 'Perfil activo';
+  protected readonly isDarkMode = signal(this.getStoredTheme() === 'dark');
+
+  constructor() {
+    this.applyTheme(this.isDarkMode() ? 'dark' : 'default');
+  }
+
+  protected onMenuToggle(): void {
+    this.menuToggle.emit();
+  }
+
+  protected onThemeToggle(checked: boolean): void {
+    const theme: AppTheme = checked ? 'dark' : 'default';
+    this.isDarkMode.set(checked);
+    this.applyTheme(theme);
+  }
+
+  private applyTheme(theme: AppTheme): void {
+    this.themeService.changeTheme(theme);
+    this.storeTheme(theme);
+  }
+
+  private getStoredTheme(): AppTheme {
+    if (typeof localStorage === 'undefined') {
+      return 'default';
+    }
+
+    return localStorage.getItem('pergamo-theme') === 'dark' ? 'dark' : 'default';
+  }
+
+  private storeTheme(theme: AppTheme): void {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
+    localStorage.setItem('pergamo-theme', theme);
+  }
+}

@@ -1,0 +1,117 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.shell-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.topbar-left,
+.topbar-center,
+.topbar-right {
+  display: flex;
+  align-items: center;
+  flex: 1 1 0;
+}
+
+.topbar-left {
+  justify-content: flex-start;
+  gap: 1rem;
+}
+
+.topbar-right {
+  justify-content: flex-end;
+  gap: 2rem;
+}
+
+.topbar-center {
+  justify-content: center;
+  min-width: 0;
+}
+
+.topbar-center > * {
+  width: 100%;
+  max-width: 32rem;
+}
+
+.logo-button {
+  padding-inline: 0.25rem;
+}
+
+.logo-image {
+  display: block;
+  width: auto;
+  height: 2rem;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.theme-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.notification-button {
+  position: relative;
+  padding: 0.25rem;
+  min-width: auto;
+  min-height: auto;
+  transform: translateY(-0.3rem);
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.notification-icon {
+  color: inherit;
+  width: 2rem;
+  height: 2rem;
+  transition: color 0.2s ease;
+}
+
+:host ::ng-deep .notification-icon svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+:host ::ng-deep .notification-button:hover,
+:host ::ng-deep .notification-button:focus,
+:host ::ng-deep .notification-button:active {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep .notification-button:focus-visible {
+  outline: none !important;
+}
+
+.notification-button:hover .notification-icon,
+.notification-button:focus .notification-icon {
+  color: #f2c94c;
+}
+
+@media (max-width: 768px) {
+  .shell-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .topbar-center {
+    justify-content: flex-start;
+  }
+
+  .topbar-left,
+  .topbar-center,
+  .topbar-right {
+    flex: initial;
+  }
+}

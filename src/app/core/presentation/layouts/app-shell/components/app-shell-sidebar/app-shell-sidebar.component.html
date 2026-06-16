@@ -1,0 +1,13 @@
+<div class="sidebar-content">
+  <p class="sidebar-title">{{ shellTitle() }}</p>
+  <p class="sidebar-caption">{{ shellSubtitle() }}</p>
+  <p class="sidebar-count">Items: {{ totalNavigationItems() }}</p>
+  <p class="sidebar-active">Activo: {{ activeItemTitle() }}</p>
+
+  <nb-menu
+    class="shell-nav"
+    [items]="menuItems()"
+    [tag]="menuTag"
+    aria-label="Menu principal"
+  ></nb-menu>
+</div>

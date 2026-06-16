@@ -1,0 +1,9 @@
+<a
+  [routerLink]="item().path"
+  routerLinkActive="is-active"
+  [routerLinkActiveOptions]="{ exact: item().path === '/dashboard' }"
+  class="nav-item"
+>
+  <span class="nav-label">{{ item().label }}</span>
+  <span class="nav-description">{{ item().description }}</span>
+</a>

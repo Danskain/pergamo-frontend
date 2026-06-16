@@ -1,0 +1,27 @@
+<nb-layout windowMode>
+  <nb-layout-header fixed>
+    <app-shell-topbar
+      [appName]="appName()"
+      (menuToggle)="toggleSidebar()"
+    />
+  </nb-layout-header>
+
+  <nb-sidebar tag="main-menu" responsive>
+    <app-shell-sidebar
+      [shellTitle]="shellTitle()"
+      [shellSubtitle]="shellSubtitle()"
+      [navigationItems]="navigationItems()"
+    />
+  </nb-sidebar>
+
+  <nb-layout-column>
+    <app-shell-content />
+  </nb-layout-column>
+
+  <nb-layout-footer>
+    <app-shell-footer
+      [appName]="appName()"
+      [currentYear]="currentYear"
+    />
+  </nb-layout-footer>
+</nb-layout>

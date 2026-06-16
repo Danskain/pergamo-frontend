@@ -1,0 +1,58 @@
+:host {
+  display: block;
+}
+
+.sidebar-content {
+  padding: 1.5rem 1rem;
+}
+
+:host-context(nb-sidebar.compacted) .sidebar-content {
+  padding-inline: 0.5rem;
+}
+
+.sidebar-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sidebar-caption {
+  margin: 0;
+  color: #5a6782;
+  line-height: 1.4;
+}
+
+.sidebar-count {
+  margin: 0.75rem 0 1.5rem;
+  font-size: 0.875rem;
+  color: #8f9bb3;
+}
+
+.sidebar-active {
+  margin: -0.75rem 0 1.25rem;
+  font-size: 0.875rem;
+  color: #3366ff;
+  font-weight: 600;
+}
+
+:host-context(nb-sidebar.compacted) .sidebar-title,
+:host-context(nb-sidebar.compacted) .sidebar-caption,
+:host-context(nb-sidebar.compacted) .sidebar-count,
+:host-context(nb-sidebar.compacted) .sidebar-active {
+  display: none;
+}
+
+.shell-nav {
+  display: block;
+}
+
+:host ::ng-deep .shell-nav .menu-items {
+  margin: 0;
+}
+
+:host ::ng-deep .shell-nav .menu-item a {
+  border-radius: 0.75rem;
+  margin-bottom: 0.5rem;
+}

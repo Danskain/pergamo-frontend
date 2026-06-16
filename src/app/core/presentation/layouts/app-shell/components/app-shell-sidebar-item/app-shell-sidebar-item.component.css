@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.nav-item {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  color: inherit;
+  text-decoration: none;
+  background: rgba(51, 102, 255, 0.06);
+  transition: background-color 0.2s ease;
+}
+
+.nav-item:hover,
+.nav-item.is-active {
+  background: rgba(51, 102, 255, 0.14);
+}
+
+.nav-label {
+  font-weight: 700;
+}
+
+.nav-description {
+  font-size: 0.875rem;
+  color: #5a6782;
+}

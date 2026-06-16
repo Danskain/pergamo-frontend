@@ -1,0 +1,50 @@
+<div class="shell-header">
+  <div class="topbar-left">
+    <button
+      nbButton
+      ghost
+      size="small"
+      class="logo-button"
+      (click)="onMenuToggle()"
+      aria-label="Abrir menu"
+    >
+      <img src="/logop.png" alt="Logo de Pergamo" class="logo-image" />
+    </button>
+    <nb-search type="rotate-layout"></nb-search>
+  </div>
+
+  <div class="topbar-center">
+  </div>
+
+  <div class="topbar-right">
+    <nb-toggle
+      [checked]="isDarkMode()"
+      (checkedChange)="onThemeToggle($event)"
+      aria-label="Cambiar entre modo claro y oscuro"
+    ></nb-toggle>
+    <button
+      nbButton
+      ghost
+      size="small"
+      class="notification-button"
+      aria-label="Notificaciones"
+    >
+      <nb-icon icon="bell-outline" class="notification-icon"></nb-icon>
+      <nb-badge
+        [text]="notificationCount.toString()"
+        status="danger"
+        position="top right"
+      ></nb-badge>
+    </button>
+    <nb-user
+      class="topbar-user"
+      [name]="userName"
+      [title]="userTitle"
+      badgePosition="bottom right"
+      badgeStatus="success"
+      color="#3366ff"
+      shape="round"
+      size="large"
+    ></nb-user>
+  </div>
+</div>

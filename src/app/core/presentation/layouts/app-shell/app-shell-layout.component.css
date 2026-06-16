@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+:host ::ng-deep nb-layout-header nav,
+:host ::ng-deep nb-layout-header div {
+  width: 100%;
+}
+
+:host ::ng-deep nb-layout-footer nav,
+:host ::ng-deep nb-layout-footer div {
+  width: 100%;
+}

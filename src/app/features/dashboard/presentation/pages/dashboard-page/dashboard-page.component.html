@@ -1,0 +1,22 @@
+<section class="dashboard-page">
+  <nb-card>
+    <nb-card-header>{{ featureName() }} Feature</nb-card-header>
+    <nb-card-body>
+      Esta pantalla vive dentro de una feature lazy-loaded y usa Angular moderno
+      con signals para preparar el crecimiento modular de la aplicacion.
+    </nb-card-body>
+  </nb-card>
+
+  <nb-card>
+    <nb-card-header>Capas Iniciales</nb-card-header>
+    <nb-card-body>
+      <p class="pillars-title">Total de capas: {{ totalPillars() }}</p>
+
+      <div class="pillars">
+        @for (pillar of pillars(); track pillar) {
+          <span class="pillar">{{ pillar }}</span>
+        }
+      </div>
+    </nb-card-body>
+  </nb-card>
+</section>

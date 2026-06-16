@@ -1,0 +1,49 @@
+<section class="contabilidad-page">
+  <nb-card>
+    <nb-card-header>Contabilidad</nb-card-header>
+    <nb-card-body>
+      <p class="page-copy">
+        Feature de negocio organizada con arquitectura hexagonal y cargada por lazy loading.
+      </p>
+
+      @if (summary(); as data) {
+        <p class="page-period">Periodo activo: {{ data.period }}</p>
+      }
+    </nb-card-body>
+  </nb-card>
+
+  <section class="metrics-grid">
+    @for (metric of metrics(); track metric.label) {
+      <nb-card>
+        <nb-card-header>{{ metric.label }}</nb-card-header>
+        <nb-card-body>
+          <p class="metric-value">{{ metric.value }}</p>
+          <span class="metric-trend" [ngClass]="metric.trend">{{ metric.trend }}</span>
+        </nb-card-body>
+      </nb-card>
+    }
+  </section>
+
+  <nb-card>
+    <nb-card-header>Movimientos recientes</nb-card-header>
+    <nb-card-body>
+      <div class="movements-list">
+        @for (movement of recentMovements(); track movement.id) {
+          <article class="movement-item">
+            <div>
+              <p class="movement-concept">{{ movement.concept }}</p>
+              <p class="movement-meta">
+                Cuenta {{ movement.account }} · {{ movement.registeredAt | date: 'mediumDate' }}
+              </p>
+            </div>
+
+            <div class="movement-side">
+              <p class="movement-amount">{{ movement.amount | currency: 'COP' : 'symbol' : '1.0-0' }}</p>
+              <span class="movement-status" [ngClass]="movement.status">{{ movement.status }}</span>
+            </div>
+          </article>
+        }
+      </div>
+    </nb-card-body>
+  </nb-card>
+</section>
