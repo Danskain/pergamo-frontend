@@ -1,0 +1,415 @@
+<section class="tipos-documentos-page">
+  <app-crud-page-hero
+    eyebrow="Contabilidad / Tipos de Documentos"
+    title="Tipos de Documentos"
+    description="Administra los tipos de documentos fuente y sus reglas operativas dentro del modulo de contabilidad."
+  >
+    <div crudHeroActions class="hero-actions">
+      <button nbButton status="primary" (click)="startCreate()">
+        <nb-icon icon="plus-outline"></nb-icon>
+        Nuevo tipo
+      </button>
+
+      <button nbButton ghost status="basic" (click)="refreshData()">
+        <nb-icon icon="refresh-outline"></nb-icon>
+        Recargar
+      </button>
+    </div>
+  </app-crud-page-hero>
+
+  @if (showForm()) {
+    <section class="workspace-grid workspace-grid--form">
+      <app-crud-section-card
+        kicker="Formulario"
+        [title]="formTitle()"
+        [loading]="submitting() || selectedDocumentSourceTypeResource.isLoading()"
+      >
+        <button
+          crudSectionActions
+          nbButton
+          ghost
+          status="basic"
+          type="button"
+          (click)="closeForm()"
+        >
+          Volver a la tabla
+        </button>
+
+        <form class="crud-form" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-grid">
+            <label class="field">
+              <span class="field-label">Codigo</span>
+              <input nbInput fullWidth formControlName="code" placeholder="Ej. DOC-01" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Nombre</span>
+              <input
+                nbInput
+                fullWidth
+                formControlName="name"
+                placeholder="Factura de venta"
+              />
+            </label>
+          </div>
+
+          <label class="field field--full">
+            <span class="field-label">Descripcion</span>
+            <textarea
+              nbInput
+              fullWidth
+              rows="4"
+              formControlName="description"
+              placeholder="Describe el alcance o uso del tipo de documento"
+            ></textarea>
+          </label>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Genera contabilidad</p>
+              <p class="toggle-copy">Define si el documento genera movimiento contable.</p>
+            </div>
+            <nb-toggle formControlName="generatesAccounting"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Entrada manual</p>
+              <p class="toggle-copy">Define si el documento permite registro manual.</p>
+            </div>
+            <nb-toggle formControlName="manualEntry"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Requiere aprobacion</p>
+              <p class="toggle-copy">Define si el documento necesita aprobacion previa.</p>
+            </div>
+            <nb-toggle formControlName="requiresApproval"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Requiere tercero</p>
+              <p class="toggle-copy">Define si el documento exige tercero asociado.</p>
+            </div>
+            <nb-toggle formControlName="requiresThird"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Requiere CECO</p>
+              <p class="toggle-copy">Define si el documento exige centro de costo.</p>
+            </div>
+            <nb-toggle formControlName="requiresCeco"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Afecta inventario</p>
+              <p class="toggle-copy">Define si el documento afecta inventario.</p>
+            </div>
+            <nb-toggle formControlName="affectsInventory"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Afecta cartera</p>
+              <p class="toggle-copy">Define si el documento afecta cartera.</p>
+            </div>
+            <nb-toggle formControlName="affectsCartera"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Afecta CxP</p>
+              <p class="toggle-copy">Define si el documento afecta cuentas por pagar.</p>
+            </div>
+            <nb-toggle formControlName="affectsCxp"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Afecta tesoreria</p>
+              <p class="toggle-copy">Define si el documento afecta tesoreria.</p>
+            </div>
+            <nb-toggle formControlName="affectsTreasury"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Permite reverso</p>
+              <p class="toggle-copy">Define si el documento permite reversar operaciones.</p>
+            </div>
+            <nb-toggle formControlName="allowsReversal"></nb-toggle>
+          </div>
+
+          <div class="form-actions">
+            <button nbButton status="primary" type="submit" [disabled]="submitting()">
+              {{ submitLabel() }}
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="closeForm()">
+              Cancelar
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="startCreate()">
+              Limpiar formulario
+            </button>
+          </div>
+        </form>
+      </app-crud-section-card>
+    </section>
+  } @else {
+    <section class="workspace-grid workspace-grid--table">
+      <app-crud-section-card
+        kicker="Registros"
+        title="Tabla"
+        summary="Consulta, busca y administra todos los registros de tipos de documentos."
+        [loading]="documentSourceTypesResource.isLoading()"
+      >
+        <app-crud-collection-shell
+          [hasItems]="documentSourceTypes().length > 0"
+          [pageSummary]="pageSummary()"
+          [currentPage]="pagination().currentPage"
+          [lastPage]="pagination().lastPage"
+          [canGoPrevious]="canGoPrevious()"
+          [canGoNext]="canGoNext()"
+          [perPage]="perPage()"
+          [perPageOptions]="perPageOptions()"
+          (previousPage)="goToPreviousPage()"
+          (nextPage)="goToNextPage()"
+          (perPageChange)="changePerPage($event)"
+        >
+          <label crudSearch class="search-field" for="document-source-type-search">
+            <span>Buscar</span>
+            <input
+              nbInput
+              fullWidth
+              id="document-source-type-search"
+              class="search-input"
+              placeholder="Buscar"
+              [nbFilterInput]="treeGridDataSource()"
+            />
+          </label>
+
+          <div crudDesktopContent class="table-shell">
+            <table
+              class="crud-tree-grid"
+              [nbTreeGrid]="treeGridDataSource()"
+              [nbSort]="treeGridDataSource()"
+              (sort)="changeSort($event)"
+            >
+              <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="treeGridAllColumns"></tr>
+              <tr nbTreeGridRow *nbTreeGridRowDef="let row; columns: treeGridAllColumns"></tr>
+
+              <ng-container [nbTreeGridColumnDef]="treeGridCustomColumn">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection(treeGridCustomColumn)"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Nombre
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <div class="identity-cell">
+                    <div class="cell-stack">
+                      <strong>{{ row.data.name }}</strong>
+                      <span>Codigo base {{ row.data.code }}</span>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="id">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('id')" *nbTreeGridHeaderCellDef>
+                  Id
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">
+                  {{ row.data.id }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="code">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('code')" *nbTreeGridHeaderCellDef>
+                  Codigo
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="code-pill">{{ row.data.code }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="description">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('description')" *nbTreeGridHeaderCellDef>
+                  Descripcion
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="description-cell">
+                  <span class="description-text">{{ row.data.description }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="generatesAccounting">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('generatesAccounting')" *nbTreeGridHeaderCellDef>
+                  Contab.
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row"><span class="status-pill" [class.status-pill--positive]="row.data.generatesAccounting">{{ row.data.generatesAccounting ? 'Si' : 'No' }}</span></td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="manualEntry">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('manualEntry')" *nbTreeGridHeaderCellDef>
+                  Manual
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row"><span class="status-pill" [class.status-pill--positive]="row.data.manualEntry">{{ row.data.manualEntry ? 'Si' : 'No' }}</span></td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="requiresApproval">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('requiresApproval')" *nbTreeGridHeaderCellDef>
+                  Aprob.
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row"><span class="status-pill" [class.status-pill--positive]="row.data.requiresApproval">{{ row.data.requiresApproval ? 'Si' : 'No' }}</span></td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="requiresThird">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('requiresThird')" *nbTreeGridHeaderCellDef>
+                  Tercero
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row"><span class="status-pill" [class.status-pill--positive]="row.data.requiresThird">{{ row.data.requiresThird ? 'Si' : 'No' }}</span></td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="requiresCeco">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('requiresCeco')" *nbTreeGridHeaderCellDef>
+                  CECO
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row"><span class="status-pill" [class.status-pill--positive]="row.data.requiresCeco">{{ row.data.requiresCeco ? 'Si' : 'No' }}</span></td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="affectsInventory">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('affectsInventory')" *nbTreeGridHeaderCellDef>
+                  Inv.
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row"><span class="status-pill" [class.status-pill--positive]="row.data.affectsInventory">{{ row.data.affectsInventory ? 'Si' : 'No' }}</span></td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="affectsCartera">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('affectsCartera')" *nbTreeGridHeaderCellDef>
+                  Cartera
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row"><span class="status-pill" [class.status-pill--positive]="row.data.affectsCartera">{{ row.data.affectsCartera ? 'Si' : 'No' }}</span></td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="affectsCxp">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('affectsCxp')" *nbTreeGridHeaderCellDef>
+                  CxP
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row"><span class="status-pill" [class.status-pill--positive]="row.data.affectsCxp">{{ row.data.affectsCxp ? 'Si' : 'No' }}</span></td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="affectsTreasury">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('affectsTreasury')" *nbTreeGridHeaderCellDef>
+                  Tesoreria
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row"><span class="status-pill" [class.status-pill--positive]="row.data.affectsTreasury">{{ row.data.affectsTreasury ? 'Si' : 'No' }}</span></td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="allowsReversal">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('allowsReversal')" *nbTreeGridHeaderCellDef>
+                  Reverso
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row"><span class="status-pill" [class.status-pill--positive]="row.data.allowsReversal">{{ row.data.allowsReversal ? 'Si' : 'No' }}</span></td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="createdAt">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('createdAt')" *nbTreeGridHeaderCellDef>
+                  Creado
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="date-cell">
+                  {{ row.data.createdAt | date: 'yyyy-MM-dd HH:mm:ss' }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="actions">
+                <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef class="actions-column">Acciones</th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="actions-column">
+                  <div class="row-actions">
+                    <button nbButton ghost status="info" size="small" class="action-button" type="button" title="Editar" aria-label="Editar registro" (click)="editDocumentSourceType(row.data.id)">
+                      <nb-icon icon="edit-2-outline"></nb-icon>
+                    </button>
+
+                    @if (row.data.deletedAt) {
+                      <button nbButton ghost status="success" size="small" class="action-button" type="button" title="Restaurar" aria-label="Restaurar registro" (click)="restoreDocumentSourceType(row.data.id)" [disabled]="restoringId() === row.data.id">
+                        <nb-icon icon="undo-outline"></nb-icon>
+                      </button>
+                    } @else {
+                      <button nbButton ghost status="danger" size="small" class="action-button" type="button" title="Eliminar" aria-label="Eliminar registro" (click)="deleteDocumentSourceType(row.data.id)" [disabled]="deletingId() === row.data.id">
+                        <nb-icon icon="trash-2-outline"></nb-icon>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+            </table>
+          </div>
+
+          <div crudMobileContent class="mobile-list">
+            @for (documentSourceType of documentSourceTypes(); track documentSourceType.id) {
+              <article class="mobile-card">
+                <div class="mobile-card__header">
+                  <div class="mobile-card__identity">
+                    <strong>{{ documentSourceType.name }}</strong>
+                    <span>{{ documentSourceType.description }}</span>
+                  </div>
+                  <span class="code-pill">{{ documentSourceType.code }}</span>
+                </div>
+
+                <div class="mobile-card__grid">
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Id</span>
+                    <span class="mobile-detail__value">{{ documentSourceType.id }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Contabilidad</span>
+                    <span class="status-pill" [class.status-pill--positive]="documentSourceType.generatesAccounting">{{ documentSourceType.generatesAccounting ? 'Si' : 'No' }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Manual</span>
+                    <span class="status-pill" [class.status-pill--positive]="documentSourceType.manualEntry">{{ documentSourceType.manualEntry ? 'Si' : 'No' }}</span>
+                  </div>
+                  <div class="mobile-detail mobile-detail--full">
+                    <span class="mobile-detail__label">Creado</span>
+                    <span class="mobile-detail__value">{{ documentSourceType.createdAt | date: 'yyyy-MM-dd HH:mm:ss' }}</span>
+                  </div>
+                </div>
+
+                <div class="mobile-card__actions">
+                  <button nbButton ghost status="info" size="small" class="action-button" type="button" (click)="editDocumentSourceType(documentSourceType.id)">
+                    <nb-icon icon="edit-2-outline"></nb-icon>
+                    Editar
+                  </button>
+
+                  @if (documentSourceType.deletedAt) {
+                    <button nbButton ghost status="success" size="small" class="action-button" type="button" (click)="restoreDocumentSourceType(documentSourceType.id)" [disabled]="restoringId() === documentSourceType.id">
+                      <nb-icon icon="undo-outline"></nb-icon>
+                      Restaurar
+                    </button>
+                  } @else {
+                    <button nbButton ghost status="danger" size="small" class="action-button" type="button" (click)="deleteDocumentSourceType(documentSourceType.id)" [disabled]="deletingId() === documentSourceType.id">
+                      <nb-icon icon="trash-2-outline"></nb-icon>
+                      Eliminar
+                    </button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+
+          <div crudEmptyState class="empty-state">
+            <nb-icon icon="file-outline"></nb-icon>
+            <h3>Sin registros</h3>
+            <p>
+              Todavia no hay tipos de documentos para esta consulta. Usa el boton `Nuevo tipo`
+              para crear el primero.
+            </p>
+          </div>
+        </app-crud-collection-shell>
+      </app-crud-section-card>
+    </section>
+  }
+</section>

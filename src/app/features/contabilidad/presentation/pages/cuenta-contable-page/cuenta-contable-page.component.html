@@ -1,0 +1,430 @@
+<section class="cuenta-contable-page">
+  <app-crud-page-hero
+    eyebrow="Contabilidad / Cuenta Contable"
+    title="Cuenta Contable"
+    description="Administra las cuentas contables, su clasificacion contable y las configuraciones operativas asociadas dentro del modulo de contabilidad."
+  >
+    <div crudHeroActions class="hero-actions">
+      <button nbButton status="primary" (click)="startCreate()">
+        <nb-icon icon="plus-outline"></nb-icon>
+        Nueva cuenta
+      </button>
+
+      <button nbButton ghost status="basic" (click)="refreshData()">
+        <nb-icon icon="refresh-outline"></nb-icon>
+        Recargar
+      </button>
+    </div>
+  </app-crud-page-hero>
+
+  @if (showForm()) {
+    <section class="workspace-grid workspace-grid--form">
+      <app-crud-section-card
+        kicker="Formulario"
+        [title]="formTitle()"
+        [loading]="submitting() || selectedAccountingAccountResource.isLoading()"
+      >
+        <button
+          crudSectionActions
+          nbButton
+          ghost
+          status="basic"
+          type="button"
+          (click)="closeForm()"
+        >
+          Volver a la tabla
+        </button>
+
+        <form class="crud-form" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-grid">
+            <label class="field">
+              <span class="field-label">Cuenta</span>
+              <input nbInput fullWidth formControlName="account" placeholder="Ej. 110505" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Nombre</span>
+              <input
+                nbInput
+                fullWidth
+                formControlName="name"
+                placeholder="Caja general"
+              />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Plan de cuentas</span>
+              <nb-select
+                fullWidth
+                formControlName="chartAccountId"
+                placeholder="Selecciona un plan"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of chartAccountOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Clase contable</span>
+              <nb-select
+                fullWidth
+                formControlName="accountClassId"
+                placeholder="Selecciona una clase"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of accountClassOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Tipo de cuentas</span>
+              <nb-select
+                fullWidth
+                formControlName="typesAccountId"
+                placeholder="Selecciona un tipo"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of typesAccountOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Grupo contable</span>
+              <nb-select
+                fullWidth
+                formControlName="accountingGroupId"
+                placeholder="Selecciona un grupo"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of accountingGroupOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Permite transacciones manuales</p>
+              <p class="toggle-copy">
+                Activa esta opcion si la cuenta contable admite movimientos manuales.
+              </p>
+            </div>
+            <nb-toggle formControlName="allowsManualTransactions"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Cuenta asociada</p>
+              <p class="toggle-copy">
+                Activa esta opcion si la cuenta contable funciona como cuenta asociada.
+              </p>
+            </div>
+            <nb-toggle formControlName="associatedAccount"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Acepta impuestos</p>
+              <p class="toggle-copy">
+                Activa esta opcion si la cuenta contable permite aplicar impuestos.
+              </p>
+            </div>
+            <nb-toggle formControlName="acceptsTaxes"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Moneda extranjera</p>
+              <p class="toggle-copy">
+                Activa esta opcion si la cuenta contable maneja moneda extranjera.
+              </p>
+            </div>
+            <nb-toggle formControlName="foreignCurrency"></nb-toggle>
+          </div>
+
+          <div class="form-actions">
+            <button nbButton status="primary" type="submit" [disabled]="submitting()">
+              {{ submitLabel() }}
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="closeForm()">
+              Cancelar
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="startCreate()">
+              Limpiar formulario
+            </button>
+          </div>
+        </form>
+      </app-crud-section-card>
+    </section>
+  } @else {
+    <section class="workspace-grid workspace-grid--table">
+      <app-crud-section-card
+        kicker="Registros"
+        title="Tabla"
+        summary="Consulta, busca y administra todos los registros de cuenta contable."
+        [loading]="accountingAccountsResource.isLoading()"
+      >
+        <app-crud-collection-shell
+          [hasItems]="accountingAccounts().length > 0"
+          [pageSummary]="pageSummary()"
+          [currentPage]="pagination().currentPage"
+          [lastPage]="pagination().lastPage"
+          [canGoPrevious]="canGoPrevious()"
+          [canGoNext]="canGoNext()"
+          [perPage]="perPage()"
+          [perPageOptions]="perPageOptions()"
+          (previousPage)="goToPreviousPage()"
+          (nextPage)="goToNextPage()"
+          (perPageChange)="changePerPage($event)"
+        >
+          <label crudSearch class="search-field" for="accounting-account-search">
+            <span>Buscar</span>
+            <input
+              nbInput
+              fullWidth
+              id="accounting-account-search"
+              class="search-input"
+              placeholder="Buscar"
+              [nbFilterInput]="treeGridDataSource()"
+            />
+          </label>
+
+          <div crudDesktopContent class="table-shell">
+            <table
+              class="crud-tree-grid"
+              [nbTreeGrid]="treeGridDataSource()"
+              [nbSort]="treeGridDataSource()"
+              (sort)="changeSort($event)"
+            >
+              <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="treeGridAllColumns"></tr>
+              <tr nbTreeGridRow *nbTreeGridRowDef="let row; columns: treeGridAllColumns"></tr>
+
+              <ng-container [nbTreeGridColumnDef]="treeGridCustomColumn">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection(treeGridCustomColumn)"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Nombre
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <div class="identity-cell">
+                    <div class="cell-stack">
+                      <strong>{{ row.data.name }}</strong>
+                      <span>Cuenta {{ row.data.account }}</span>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="id">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('id')" *nbTreeGridHeaderCellDef>
+                  Id
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">
+                  {{ row.data.id }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="account">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('account')" *nbTreeGridHeaderCellDef>
+                  Cuenta
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="code-pill">{{ row.data.account }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="chartAccountName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('chartAccountName')" *nbTreeGridHeaderCellDef>
+                  Plan
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.chartAccountName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="accountClassName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('accountClassName')" *nbTreeGridHeaderCellDef>
+                  Clase
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.accountClassName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="typesAccountName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('typesAccountName')" *nbTreeGridHeaderCellDef>
+                  Tipo
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.typesAccountName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="accountingGroupName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('accountingGroupName')" *nbTreeGridHeaderCellDef>
+                  Grupo
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.accountingGroupName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="allowsManualTransactions">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('allowsManualTransactions')" *nbTreeGridHeaderCellDef>
+                  Manual
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="status-pill" [class.status-pill--positive]="row.data.allowsManualTransactions">
+                    {{ row.data.allowsManualTransactions ? 'Si' : 'No' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="associatedAccount">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('associatedAccount')" *nbTreeGridHeaderCellDef>
+                  Asociada
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="status-pill" [class.status-pill--positive]="row.data.associatedAccount">
+                    {{ row.data.associatedAccount ? 'Si' : 'No' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="acceptsTaxes">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('acceptsTaxes')" *nbTreeGridHeaderCellDef>
+                  Impuestos
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="status-pill" [class.status-pill--positive]="row.data.acceptsTaxes">
+                    {{ row.data.acceptsTaxes ? 'Si' : 'No' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="foreignCurrency">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('foreignCurrency')" *nbTreeGridHeaderCellDef>
+                  Moneda ext.
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="status-pill" [class.status-pill--positive]="row.data.foreignCurrency">
+                    {{ row.data.foreignCurrency ? 'Si' : 'No' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="createdAt">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('createdAt')" *nbTreeGridHeaderCellDef>
+                  Creado
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="date-cell">
+                  {{ row.data.createdAt | date: 'yyyy-MM-dd HH:mm:ss' }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="actions">
+                <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef class="actions-column">Acciones</th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="actions-column">
+                  <div class="row-actions">
+                    <button
+                      nbButton ghost status="info" size="small" class="action-button" type="button"
+                      title="Editar" aria-label="Editar registro" (click)="editAccountingAccount(row.data.id)">
+                      <nb-icon icon="edit-2-outline"></nb-icon>
+                    </button>
+
+                    @if (row.data.deletedAt) {
+                      <button
+                        nbButton ghost status="success" size="small" class="action-button" type="button"
+                        title="Restaurar" aria-label="Restaurar registro"
+                        (click)="restoreAccountingAccount(row.data.id)"
+                        [disabled]="restoringId() === row.data.id">
+                        <nb-icon icon="undo-outline"></nb-icon>
+                      </button>
+                    } @else {
+                      <button
+                        nbButton ghost status="danger" size="small" class="action-button" type="button"
+                        title="Eliminar" aria-label="Eliminar registro"
+                        (click)="deleteAccountingAccount(row.data.id)"
+                        [disabled]="deletingId() === row.data.id">
+                        <nb-icon icon="trash-2-outline"></nb-icon>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+            </table>
+          </div>
+
+          <div crudMobileContent class="mobile-list">
+            @for (accountingAccount of accountingAccounts(); track accountingAccount.id) {
+              <article class="mobile-card">
+                <div class="mobile-card__header">
+                  <div class="mobile-card__identity">
+                    <strong>{{ accountingAccount.name }}</strong>
+                    <span>Cuenta {{ accountingAccount.account }}</span>
+                  </div>
+                </div>
+
+                <div class="mobile-card__grid">
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Id</span>
+                    <span class="mobile-detail__value">{{ accountingAccount.id }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Plan</span>
+                    <span class="mobile-detail__value">{{ accountingAccount.chartAccount?.name ?? 'Id ' + accountingAccount.chartAccountId }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Clase</span>
+                    <span class="mobile-detail__value">{{ accountingAccount.accountClass?.name ?? 'Id ' + accountingAccount.accountClassId }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Tipo</span>
+                    <span class="mobile-detail__value">{{ accountingAccount.typesAccount?.name ?? 'Id ' + accountingAccount.typesAccountId }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Grupo</span>
+                    <span class="mobile-detail__value">{{ accountingAccount.accountingGroup?.name ?? 'Id ' + accountingAccount.accountingGroupId }}</span>
+                  </div>
+                </div>
+
+                <div class="mobile-card__actions">
+                  <button nbButton ghost status="info" size="small" class="action-button" type="button" (click)="editAccountingAccount(accountingAccount.id)">
+                    <nb-icon icon="edit-2-outline"></nb-icon>
+                    Editar
+                  </button>
+
+                  @if (accountingAccount.deletedAt) {
+                    <button nbButton ghost status="success" size="small" class="action-button" type="button" (click)="restoreAccountingAccount(accountingAccount.id)" [disabled]="restoringId() === accountingAccount.id">
+                      <nb-icon icon="undo-outline"></nb-icon>
+                      Restaurar
+                    </button>
+                  } @else {
+                    <button nbButton ghost status="danger" size="small" class="action-button" type="button" (click)="deleteAccountingAccount(accountingAccount.id)" [disabled]="deletingId() === accountingAccount.id">
+                      <nb-icon icon="trash-2-outline"></nb-icon>
+                      Eliminar
+                    </button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+
+          <div crudEmptyState class="empty-state">
+            <nb-icon icon="book-open-outline"></nb-icon>
+            <h3>Sin registros</h3>
+            <p>
+              Todavia no hay cuentas contables para esta consulta. Usa el boton `Nueva cuenta`
+              para crear la primera.
+            </p>
+          </div>
+        </app-crud-collection-shell>
+      </app-crud-section-card>
+    </section>
+  }
+</section>

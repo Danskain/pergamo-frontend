@@ -11,3 +11,11 @@
 :host ::ng-deep nb-layout-footer div {
   width: 100%;
 }
+
+:host ::ng-deep nb-sidebar {
+  width: 18rem;
+}
+
+:host ::ng-deep nb-sidebar.compacted {
+  width: 4.75rem;
+}

@@ -1,0 +1,63 @@
+@if (hasItems()) {
+  <div class="crud-collection-tools">
+    <ng-content select="[crudSearch]"></ng-content>
+  </div>
+
+  <div class="crud-collection-desktop">
+    <ng-content select="[crudDesktopContent]"></ng-content>
+  </div>
+
+  <div class="crud-collection-mobile">
+    <ng-content select="[crudMobileContent]"></ng-content>
+  </div>
+
+  <div class="crud-collection-footer">
+    <p class="crud-collection-footer__summary">{{ pageSummary() }}</p>
+
+    <label class="crud-collection-footer__per-page">
+      <span>Mostrar</span>
+      <nb-select
+        size="small"
+        [selected]="perPage()"
+        (selectedChange)="onPerPageChange($event)"
+        scrollStrategy="reposition"
+      >
+        @for (option of perPageOptions(); track option) {
+          <nb-option [value]="option">{{ option }}</nb-option>
+        }
+      </nb-select>
+    </label>
+
+    <div class="crud-collection-footer__pagination">
+      <button
+        nbButton
+        ghost
+        status="basic"
+        type="button"
+        title="Pagina anterior"
+        aria-label="Pagina anterior"
+        (click)="previousPage.emit()"
+        [disabled]="!canGoPrevious()"
+      >
+        <nb-icon icon="arrow-back-outline"></nb-icon>
+      </button>
+      <span class="crud-collection-footer__page-indicator">
+        Pagina {{ currentPage() }} / {{ lastPage() }}
+      </span>
+      <button
+        nbButton
+        ghost
+        status="basic"
+        type="button"
+        title="Pagina siguiente"
+        aria-label="Pagina siguiente"
+        (click)="nextPage.emit()"
+        [disabled]="!canGoNext()"
+      >
+        <nb-icon icon="arrow-forward-outline"></nb-icon>
+      </button>
+    </div>
+  </div>
+} @else {
+  <ng-content select="[crudEmptyState]"></ng-content>
+}

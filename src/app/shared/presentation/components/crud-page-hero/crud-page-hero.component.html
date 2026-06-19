@@ -1,0 +1,21 @@
+<nb-card class="crud-hero-card">
+  <nb-card-body>
+    <div class="crud-hero-copy">
+      @if (eyebrow()) {
+        <p class="crud-hero-eyebrow">{{ eyebrow() }}</p>
+      }
+
+      <h1>{{ title() }}</h1>
+
+      @if (description()) {
+        <p class="crud-hero-text">
+          {{ description() }}
+        </p>
+      }
+    </div>
+
+    <div class="crud-hero-actions">
+      <ng-content select="[crudHeroActions]"></ng-content>
+    </div>
+  </nb-card-body>
+</nb-card>

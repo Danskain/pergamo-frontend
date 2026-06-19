@@ -1,0 +1,467 @@
+<section class="centro-costo-page">
+  <app-crud-page-hero
+    eyebrow="Contabilidad / Centro de Costo"
+    title="Centro de Costo"
+    description="Administra los centros de costo, su estructura organizacional y las configuraciones operativas asociadas dentro del modulo de contabilidad."
+  >
+    <div crudHeroActions class="hero-actions">
+      <button nbButton status="primary" (click)="startCreate()">
+        <nb-icon icon="plus-outline"></nb-icon>
+        Nuevo centro de costo
+      </button>
+
+      <button nbButton ghost status="basic" (click)="refreshData()">
+        <nb-icon icon="refresh-outline"></nb-icon>
+        Recargar
+      </button>
+    </div>
+  </app-crud-page-hero>
+
+  @if (showForm()) {
+    <section class="workspace-grid workspace-grid--form">
+      <app-crud-section-card
+        kicker="Formulario"
+        [title]="formTitle()"
+        [loading]="submitting() || selectedCostCenterResource.isLoading()"
+      >
+        <button
+          crudSectionActions
+          nbButton
+          ghost
+          status="basic"
+          type="button"
+          (click)="closeForm()"
+        >
+          Volver a la tabla
+        </button>
+
+        <form class="crud-form" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-grid">
+            <label class="field field--full">
+              <span class="field-label">Estructura empresarial</span>
+              <nb-select
+                fullWidth
+                formControlName="businessStructureId"
+                placeholder="Selecciona una estructura"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of businessStructureOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Campus</span>
+              <nb-select
+                fullWidth
+                formControlName="campusId"
+                placeholder="Selecciona un campus"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of campusOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Codigo</span>
+              <input nbInput fullWidth formControlName="code" placeholder="Ej. CC-001" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Nombre</span>
+              <input
+                nbInput
+                fullWidth
+                formControlName="name"
+                placeholder="Administracion general"
+              />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Tipo centro de costo</span>
+              <nb-select
+                fullWidth
+                formControlName="costCenterTypeId"
+                placeholder="Selecciona un tipo"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of costCenterTypeOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Clase centro de costo</span>
+              <nb-select
+                fullWidth
+                formControlName="costCenterClassId"
+                placeholder="Selecciona una clase"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of costCenterClassOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Naturaleza centro de costo</span>
+              <nb-select
+                fullWidth
+                formControlName="costCenterNatureId"
+                placeholder="Selecciona una naturaleza"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of costCenterNatureOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+          </div>
+
+          <label class="field field--full">
+            <span class="field-label">Descripcion</span>
+            <textarea
+              nbInput
+              fullWidth
+              rows="4"
+              formControlName="description"
+              placeholder="Describe el alcance y uso del centro de costo"
+            ></textarea>
+          </label>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Permite distribucion</p>
+              <p class="toggle-copy">
+                Activa esta opcion si el centro de costo permite asignaciones o distribuciones.
+              </p>
+            </div>
+            <nb-toggle formControlName="allowsAllocation"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Distribuye costos</p>
+              <p class="toggle-copy">
+                Activa esta opcion si el centro de costo participa en distribuciones de costos.
+              </p>
+            </div>
+            <nb-toggle formControlName="distributesCosts"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Unidad funcional</p>
+              <p class="toggle-copy">
+                Activa esta opcion si el centro de costo representa una unidad funcional.
+              </p>
+            </div>
+            <nb-toggle formControlName="functionalUnit"></nb-toggle>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Centro de beneficio</p>
+              <p class="toggle-copy">
+                Activa esta opcion si el centro de costo opera como centro de beneficio.
+              </p>
+            </div>
+            <nb-toggle formControlName="profitCenter"></nb-toggle>
+          </div>
+
+          <div class="form-actions">
+            <button nbButton status="primary" type="submit" [disabled]="submitting()">
+              {{ submitLabel() }}
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="closeForm()">
+              Cancelar
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="startCreate()">
+              Limpiar formulario
+            </button>
+          </div>
+        </form>
+      </app-crud-section-card>
+    </section>
+  } @else {
+    <section class="workspace-grid workspace-grid--table">
+      <app-crud-section-card
+        kicker="Registros"
+        title="Tabla"
+        summary="Consulta, busca y administra todos los registros de centro de costo."
+        [loading]="costCentersResource.isLoading()"
+      >
+        <app-crud-collection-shell
+          [hasItems]="costCenters().length > 0"
+          [pageSummary]="pageSummary()"
+          [currentPage]="pagination().currentPage"
+          [lastPage]="pagination().lastPage"
+          [canGoPrevious]="canGoPrevious()"
+          [canGoNext]="canGoNext()"
+          [perPage]="perPage()"
+          [perPageOptions]="perPageOptions()"
+          (previousPage)="goToPreviousPage()"
+          (nextPage)="goToNextPage()"
+          (perPageChange)="changePerPage($event)"
+        >
+          <label crudSearch class="search-field" for="cost-center-search">
+            <span>Buscar</span>
+            <input
+              nbInput
+              fullWidth
+              id="cost-center-search"
+              class="search-input"
+              placeholder="Buscar"
+              [nbFilterInput]="treeGridDataSource()"
+            />
+          </label>
+
+          <div crudDesktopContent class="table-shell">
+            <table
+              class="crud-tree-grid"
+              [nbTreeGrid]="treeGridDataSource()"
+              [nbSort]="treeGridDataSource()"
+              (sort)="changeSort($event)"
+            >
+              <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="treeGridAllColumns"></tr>
+              <tr nbTreeGridRow *nbTreeGridRowDef="let row; columns: treeGridAllColumns"></tr>
+
+              <ng-container [nbTreeGridColumnDef]="treeGridCustomColumn">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection(treeGridCustomColumn)"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Nombre
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <div class="identity-cell">
+                    <div class="cell-stack">
+                      <strong>{{ row.data.name }}</strong>
+                      <span>{{ row.data.description }}</span>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="id">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('id')" *nbTreeGridHeaderCellDef>
+                  Id
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">
+                  {{ row.data.id }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="code">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('code')" *nbTreeGridHeaderCellDef>
+                  Codigo
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="code-pill">{{ row.data.code }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="businessStructureName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('businessStructureName')" *nbTreeGridHeaderCellDef>
+                  Estructura
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.businessStructureName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="campusName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('campusName')" *nbTreeGridHeaderCellDef>
+                  Campus
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.campusName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="costCenterTypeName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('costCenterTypeName')" *nbTreeGridHeaderCellDef>
+                  Tipo
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.costCenterTypeName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="costCenterClassName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('costCenterClassName')" *nbTreeGridHeaderCellDef>
+                  Clase
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.costCenterClassName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="costCenterNatureName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('costCenterNatureName')" *nbTreeGridHeaderCellDef>
+                  Naturaleza
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.costCenterNatureName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="allowsAllocation">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('allowsAllocation')" *nbTreeGridHeaderCellDef>
+                  Asignacion
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="status-pill" [class.status-pill--positive]="row.data.allowsAllocation">
+                    {{ row.data.allowsAllocation ? 'Si' : 'No' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="distributesCosts">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('distributesCosts')" *nbTreeGridHeaderCellDef>
+                  Distribuye
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="status-pill" [class.status-pill--positive]="row.data.distributesCosts">
+                    {{ row.data.distributesCosts ? 'Si' : 'No' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="functionalUnit">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('functionalUnit')" *nbTreeGridHeaderCellDef>
+                  Unidad func.
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="status-pill" [class.status-pill--positive]="row.data.functionalUnit">
+                    {{ row.data.functionalUnit ? 'Si' : 'No' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="profitCenter">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('profitCenter')" *nbTreeGridHeaderCellDef>
+                  Beneficio
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="status-pill" [class.status-pill--positive]="row.data.profitCenter">
+                    {{ row.data.profitCenter ? 'Si' : 'No' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="createdAt">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('createdAt')" *nbTreeGridHeaderCellDef>
+                  Creado
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="date-cell">
+                  {{ row.data.createdAt | date: 'yyyy-MM-dd HH:mm:ss' }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="actions">
+                <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef class="actions-column">Acciones</th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="actions-column">
+                  <div class="row-actions">
+                    <button
+                      nbButton ghost status="info" size="small" class="action-button" type="button"
+                      title="Editar" aria-label="Editar registro" (click)="editCostCenter(row.data.id)">
+                      <nb-icon icon="edit-2-outline"></nb-icon>
+                    </button>
+
+                    @if (row.data.deletedAt) {
+                      <button
+                        nbButton ghost status="success" size="small" class="action-button" type="button"
+                        title="Restaurar" aria-label="Restaurar registro"
+                        (click)="restoreCostCenter(row.data.id)"
+                        [disabled]="restoringId() === row.data.id">
+                        <nb-icon icon="undo-outline"></nb-icon>
+                      </button>
+                    } @else {
+                      <button
+                        nbButton ghost status="danger" size="small" class="action-button" type="button"
+                        title="Eliminar" aria-label="Eliminar registro"
+                        (click)="deleteCostCenter(row.data.id)"
+                        [disabled]="deletingId() === row.data.id">
+                        <nb-icon icon="trash-2-outline"></nb-icon>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+            </table>
+          </div>
+
+          <div crudMobileContent class="mobile-list">
+            @for (costCenter of costCenters(); track costCenter.id) {
+              <article class="mobile-card">
+                <div class="mobile-card__header">
+                  <div class="mobile-card__identity">
+                    <strong>{{ costCenter.name }}</strong>
+                    <span>{{ costCenter.code }}</span>
+                  </div>
+                </div>
+
+                <div class="mobile-card__grid">
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Id</span>
+                    <span class="mobile-detail__value">{{ costCenter.id }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Estructura</span>
+                    <span class="mobile-detail__value">{{ costCenter.businessStructure?.label ?? costCenter.businessStructure?.name ?? 'Id ' + costCenter.businessStructureId }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Campus</span>
+                    <span class="mobile-detail__value">{{ costCenter.campus?.label ?? costCenter.campus?.name ?? 'Id ' + costCenter.campusId }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Tipo</span>
+                    <span class="mobile-detail__value">{{ costCenter.costCenterType?.name ?? 'Id ' + costCenter.costCenterTypeId }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Clase</span>
+                    <span class="mobile-detail__value">{{ costCenter.costCenterClass?.name ?? 'Id ' + costCenter.costCenterClassId }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Naturaleza</span>
+                    <span class="mobile-detail__value">{{ costCenter.costCenterNature?.name ?? 'Id ' + costCenter.costCenterNatureId }}</span>
+                  </div>
+                </div>
+
+                <div class="mobile-card__actions">
+                  <button nbButton ghost status="info" size="small" class="action-button" type="button" (click)="editCostCenter(costCenter.id)">
+                    <nb-icon icon="edit-2-outline"></nb-icon>
+                    Editar
+                  </button>
+
+                  @if (costCenter.deletedAt) {
+                    <button nbButton ghost status="success" size="small" class="action-button" type="button" (click)="restoreCostCenter(costCenter.id)" [disabled]="restoringId() === costCenter.id">
+                      <nb-icon icon="undo-outline"></nb-icon>
+                      Restaurar
+                    </button>
+                  } @else {
+                    <button nbButton ghost status="danger" size="small" class="action-button" type="button" (click)="deleteCostCenter(costCenter.id)" [disabled]="deletingId() === costCenter.id">
+                      <nb-icon icon="trash-2-outline"></nb-icon>
+                      Eliminar
+                    </button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+
+          <div crudEmptyState class="empty-state">
+            <nb-icon icon="map-outline"></nb-icon>
+            <h3>Sin registros</h3>
+            <p>
+              Todavia no hay centros de costo para esta consulta. Usa el boton
+              `Nuevo centro de costo` para crear el primero.
+            </p>
+          </div>
+        </app-crud-collection-shell>
+      </app-crud-section-card>
+    </section>
+  }
+</section>

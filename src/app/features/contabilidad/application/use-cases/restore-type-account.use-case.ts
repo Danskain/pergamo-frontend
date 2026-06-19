@@ -1,0 +1,15 @@
+import { inject, Injectable } from '@angular/core';
+
+import {
+  TYPE_ACCOUNT_REPOSITORY,
+  TypeAccountRepository
+} from '../ports/type-account.repository';
+
+@Injectable()
+export class RestoreTypeAccountUseCase {
+  private readonly repository = inject<TypeAccountRepository>(TYPE_ACCOUNT_REPOSITORY);
+
+  execute(id: number) {
+    return this.repository.restore(id);
+  }
+}

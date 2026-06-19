@@ -1,0 +1,493 @@
+<section class="variante-page">
+  <app-crud-page-hero
+    eyebrow="Contabilidad / Variante Ejercicio"
+    title="Variante Ejercicio"
+    description="La variante de ejercicio fiscal controla, Cómo se divide el año contable, Cuántos períodos contables existen, Fechas de inicio y fin del ejercicio, Períodos especiales de cierre y Relación entre período fiscal y calendario"
+  >
+    <div crudHeroActions class="hero-actions">
+      <button nbButton status="primary" (click)="startCreate()">
+        <nb-icon icon="plus-outline"></nb-icon>
+        Nueva variante
+      </button>
+
+      <button nbButton ghost status="basic" (click)="refreshData()">
+        <nb-icon icon="refresh-outline"></nb-icon>
+        Recargar
+      </button>
+    </div>
+  </app-crud-page-hero>
+
+  @if (showForm()) {
+    <section class="workspace-grid workspace-grid--form">
+      <app-crud-section-card
+        kicker="Formulario"
+        [title]="formTitle()"
+        [loading]="submitting() || selectedVariationResource.isLoading()"
+      >
+        <button
+          crudSectionActions
+          nbButton
+          ghost
+          status="basic"
+          type="button"
+          (click)="closeForm()"
+        >
+          Volver a la tabla
+        </button>
+
+        <form class="variation-form" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-grid">
+              <label class="field">
+                <span class="field-label">Codigo</span>
+                <input nbInput fullWidth formControlName="code" placeholder="Ej. K4" />
+              </label>
+
+              <label class="field">
+                <span class="field-label">Nombre</span>
+                <input
+                  nbInput
+                  fullWidth
+                  formControlName="name"
+                  placeholder="Nombre descriptivo"
+                />
+              </label>
+
+              <label class="field">
+                <span class="field-label">Mes inicial</span>
+                <nb-select
+                  fullWidth
+                  formControlName="startExercise"
+                  placeholder="Selecciona un mes"
+                  scrollStrategy="reposition"
+                >
+                  @for (month of months(); track month.id) {
+                    <nb-option [value]="month.id">{{ month.name }}</nb-option>
+                  }
+                </nb-select>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Mes final</span>
+                <nb-select
+                  fullWidth
+                  formControlName="endExercise"
+                  placeholder="Selecciona un mes"
+                  scrollStrategy="reposition"
+                >
+                  @for (month of months(); track month.id) {
+                    <nb-option [value]="month.id">{{ month.name }}</nb-option>
+                  }
+                </nb-select>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Periodos normales</span>
+                <input
+                  nbInput
+                  fullWidth
+                  type="number"
+                  formControlName="normalPeriods"
+                  min="1"
+                  placeholder="Ingresa el valor"
+                />
+              </label>
+
+              <label class="field">
+                <span class="field-label">Periodos especiales</span>
+                <input
+                  nbInput
+                  fullWidth
+                  type="number"
+                  formControlName="specialPeriods"
+                  min="0"
+                  placeholder="Ingresa el valor"
+                />
+              </label>
+            </div>
+
+            <label class="field field--full">
+              <span class="field-label">Descripcion</span>
+              <textarea
+                nbInput
+                fullWidth
+                rows="4"
+                formControlName="description"
+                placeholder="Describe el comportamiento de la variante"
+              ></textarea>
+            </label>
+
+            <div class="toggle-row">
+              <div>
+                <p class="toggle-label">Dependiente de calendario</p>
+                <p class="toggle-copy">
+                  Activa esta opcion si la variante depende del calendario fiscal.
+                </p>
+              </div>
+
+              <nb-toggle formControlName="calendarDependent"></nb-toggle>
+            </div>
+
+            <div class="form-actions">
+              <button nbButton status="primary" type="submit" [disabled]="submitting()">
+                {{ submitLabel() }}
+              </button>
+              <button nbButton ghost status="basic" type="button" (click)="closeForm()">
+                Cancelar
+              </button>
+              <button nbButton ghost status="basic" type="button" (click)="startCreate()">
+                Limpiar formulario
+              </button>
+            </div>
+        </form>
+      </app-crud-section-card>
+    </section>
+  } @else {
+    <section class="workspace-grid workspace-grid--table">
+      <app-crud-section-card
+        kicker="Registros"
+        title="Tabla"
+        summary="Consulta, busca y administra todos los registros de variante ejercicio."
+        [loading]="variationsResource.isLoading()"
+      >
+        <app-crud-collection-shell
+          [hasItems]="variations().length > 0"
+          [pageSummary]="pageSummary()"
+          [currentPage]="pagination().currentPage"
+          [lastPage]="pagination().lastPage"
+          [canGoPrevious]="canGoPrevious()"
+          [canGoNext]="canGoNext()"
+          [perPage]="perPage()"
+          [perPageOptions]="perPageOptions()"
+          (previousPage)="goToPreviousPage()"
+          (nextPage)="goToNextPage()"
+          (perPageChange)="changePerPage($event)"
+        >
+          <label crudSearch class="search-field" for="variation-search">
+            <span>Buscar</span>
+            <input
+              nbInput
+              fullWidth
+              id="variation-search"
+              class="search-input"
+              placeholder="Buscar"
+              [nbFilterInput]="treeGridDataSource()"
+            />
+          </label>
+
+          <div crudDesktopContent class="table-shell">
+            <table
+              class="variation-tree-grid"
+              [nbTreeGrid]="treeGridDataSource()"
+              [nbSort]="treeGridDataSource()"
+              (sort)="changeSort($event)"
+            >
+              <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="treeGridAllColumns"></tr>
+              <tr nbTreeGridRow *nbTreeGridRowDef="let row; columns: treeGridAllColumns"></tr>
+
+              <ng-container [nbTreeGridColumnDef]="treeGridCustomColumn">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection(treeGridCustomColumn)"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Nombre
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <div class="identity-cell">
+                    <div class="cell-stack">
+                      <strong>{{ row.data.name }}</strong>
+                      <span>{{ row.data.description }}</span>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="id">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('id')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Id
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">
+                  {{ row.data.id }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="code">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('code')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Codigo
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="code-pill">{{ row.data.code }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="description">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('description')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Descripcion
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="description-cell">
+                  <span class="description-text">{{ row.data.description }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="startMonth">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('startMonth')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Mes Inicial
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  {{ row.data.startMonth }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="endMonth">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('endMonth')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Mes Final
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  {{ row.data.endMonth }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="startExercise">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('startExercise')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Inicio
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">
+                  {{ row.data.startExercise }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="endExercise">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('endExercise')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Fin
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">
+                  {{ row.data.endExercise }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="normalPeriods">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('normalPeriods')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Periodos Normales
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">
+                  {{ row.data.normalPeriods }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="specialPeriods">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('specialPeriods')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Periodos Especiales
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">
+                  {{ row.data.specialPeriods }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="calendarDependent">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('calendarDependent')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Dependiente Calendario
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span
+                    class="status-pill"
+                    [class.status-pill--calendar]="row.data.calendarDependent"
+                  >
+                    {{ row.data.calendarDependent ? 'Si' : 'No' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="createdAt">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('createdAt')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Creado
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="date-cell">
+                  {{ row.data.createdAt | date: 'yyyy-MM-dd HH:mm:ss' }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="actions">
+                <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef class="actions-column">
+                  Acciones
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="actions-column">
+                  <div class="row-actions">
+                    <button
+                      nbButton
+                      ghost
+                      status="info"
+                      size="small"
+                      class="action-button"
+                      type="button"
+                      title="Editar"
+                      aria-label="Editar registro"
+                      (click)="editVariation(row.data.id)"
+                    >
+                      <nb-icon icon="edit-2-outline"></nb-icon>
+                    </button>
+                    <button
+                      nbButton
+                      ghost
+                      status="danger"
+                      size="small"
+                      class="action-button"
+                      type="button"
+                      title="Eliminar"
+                      aria-label="Eliminar registro"
+                      (click)="deleteVariation(row.data.id)"
+                      [disabled]="deletingId() === row.data.id"
+                    >
+                      <nb-icon icon="trash-2-outline"></nb-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+            </table>
+          </div>
+
+          <div crudMobileContent class="variation-mobile-list">
+            @for (variation of variations(); track variation.id) {
+              <article class="variation-mobile-card">
+                <div class="variation-mobile-card__header">
+                  <div class="variation-mobile-card__identity">
+                    <strong>{{ variation.name }}</strong>
+                    <span>{{ variation.description }}</span>
+                  </div>
+
+                  <span class="code-pill">{{ variation.code }}</span>
+                </div>
+
+                <div class="variation-mobile-card__grid">
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Id</span>
+                    <span class="mobile-detail__value">{{ variation.id }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Mes inicial</span>
+                    <span class="mobile-detail__value">{{ variation.startMonth?.name ?? '-' }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Mes final</span>
+                    <span class="mobile-detail__value">{{ variation.endMonth?.name ?? '-' }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Inicio</span>
+                    <span class="mobile-detail__value">{{ variation.startExercise }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Fin</span>
+                    <span class="mobile-detail__value">{{ variation.endExercise }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">P. normales</span>
+                    <span class="mobile-detail__value">{{ variation.normalPeriods }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">P. especiales</span>
+                    <span class="mobile-detail__value">{{ variation.specialPeriods }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Calendario</span>
+                    <span
+                      class="status-pill"
+                      [class.status-pill--calendar]="variation.calendarDependent"
+                    >
+                      {{ variation.calendarDependent ? 'Si' : 'No' }}
+                    </span>
+                  </div>
+                  <div class="mobile-detail mobile-detail--full">
+                    <span class="mobile-detail__label">Creado</span>
+                    <span class="mobile-detail__value">
+                      {{ variation.createdAt | date: 'yyyy-MM-dd HH:mm:ss' }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="variation-mobile-card__actions">
+                  <button
+                    nbButton
+                    ghost
+                    status="info"
+                    size="small"
+                    class="action-button"
+                    type="button"
+                    (click)="editVariation(variation.id)"
+                  >
+                    <nb-icon icon="edit-2-outline"></nb-icon>
+                    Editar
+                  </button>
+                  <button
+                    nbButton
+                    ghost
+                    status="danger"
+                    size="small"
+                    class="action-button"
+                    type="button"
+                    (click)="deleteVariation(variation.id)"
+                    [disabled]="deletingId() === variation.id"
+                  >
+                    <nb-icon icon="trash-2-outline"></nb-icon>
+                    Eliminar
+                  </button>
+                </div>
+              </article>
+            }
+          </div>
+
+          <div crudEmptyState class="empty-state">
+            <nb-icon icon="layers-outline"></nb-icon>
+            <h3>Sin registros</h3>
+            <p>
+              Todavia no hay variantes para esta consulta. Usa el boton `Nueva variante`
+              para crear la primera.
+            </p>
+          </div>
+        </app-crud-collection-shell>
+      </app-crud-section-card>
+    </section>
+  }
+</section>

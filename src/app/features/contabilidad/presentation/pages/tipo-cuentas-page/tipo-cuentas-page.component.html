@@ -1,0 +1,336 @@
+<section class="tipo-cuentas-page">
+  <app-crud-page-hero
+    eyebrow="Contabilidad / Tipo de Cuentas"
+    title="Tipo de Cuentas"
+    description="Administra los tipos de cuentas disponibles dentro del modulo de contabilidad y su informacion base para relacionarlos con otros formularios del sistema."
+  >
+    <div crudHeroActions class="hero-actions">
+      <button nbButton status="primary" (click)="startCreate()">
+        <nb-icon icon="plus-outline"></nb-icon>
+        Nuevo tipo
+      </button>
+
+      <button nbButton ghost status="basic" (click)="refreshData()">
+        <nb-icon icon="refresh-outline"></nb-icon>
+        Recargar
+      </button>
+    </div>
+  </app-crud-page-hero>
+
+  @if (showForm()) {
+    <section class="workspace-grid workspace-grid--form">
+      <app-crud-section-card
+        kicker="Formulario"
+        [title]="formTitle()"
+        [loading]="submitting() || selectedTypeAccountResource.isLoading()"
+      >
+        <button
+          crudSectionActions
+          nbButton
+          ghost
+          status="basic"
+          type="button"
+          (click)="closeForm()"
+        >
+          Volver a la tabla
+        </button>
+
+        <form class="crud-form" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-grid">
+            <label class="field">
+              <span class="field-label">Codigo</span>
+              <input nbInput fullWidth formControlName="code" placeholder="Ej. TIPO-01" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Nombre</span>
+              <input
+                nbInput
+                fullWidth
+                formControlName="name"
+                placeholder="Cuenta corriente"
+              />
+            </label>
+          </div>
+
+          <label class="field field--full">
+            <span class="field-label">Descripcion</span>
+            <textarea
+              nbInput
+              fullWidth
+              rows="4"
+              formControlName="description"
+              placeholder="Describe el alcance o uso del tipo de cuentas"
+            ></textarea>
+          </label>
+
+          <div class="form-actions">
+            <button nbButton status="primary" type="submit" [disabled]="submitting()">
+              {{ submitLabel() }}
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="closeForm()">
+              Cancelar
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="startCreate()">
+              Limpiar formulario
+            </button>
+          </div>
+        </form>
+      </app-crud-section-card>
+    </section>
+  } @else {
+    <section class="workspace-grid workspace-grid--table">
+      <app-crud-section-card
+        kicker="Registros"
+        title="Tabla"
+        summary="Consulta, busca y administra todos los registros de tipo de cuentas."
+        [loading]="typeAccountsResource.isLoading()"
+      >
+        <app-crud-collection-shell
+          [hasItems]="typeAccounts().length > 0"
+          [pageSummary]="pageSummary()"
+          [currentPage]="pagination().currentPage"
+          [lastPage]="pagination().lastPage"
+          [canGoPrevious]="canGoPrevious()"
+          [canGoNext]="canGoNext()"
+          [perPage]="perPage()"
+          [perPageOptions]="perPageOptions()"
+          (previousPage)="goToPreviousPage()"
+          (nextPage)="goToNextPage()"
+          (perPageChange)="changePerPage($event)"
+        >
+          <label crudSearch class="search-field" for="type-account-search">
+            <span>Buscar</span>
+            <input
+              nbInput
+              fullWidth
+              id="type-account-search"
+              class="search-input"
+              placeholder="Buscar"
+              [nbFilterInput]="treeGridDataSource()"
+            />
+          </label>
+
+          <div crudDesktopContent class="table-shell">
+            <table
+              class="crud-tree-grid"
+              [nbTreeGrid]="treeGridDataSource()"
+              [nbSort]="treeGridDataSource()"
+              (sort)="changeSort($event)"
+            >
+              <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="treeGridAllColumns"></tr>
+              <tr nbTreeGridRow *nbTreeGridRowDef="let row; columns: treeGridAllColumns"></tr>
+
+              <ng-container [nbTreeGridColumnDef]="treeGridCustomColumn">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection(treeGridCustomColumn)"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Nombre
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <div class="identity-cell">
+                    <div class="cell-stack">
+                      <strong>{{ row.data.name }}</strong>
+                      <span>Codigo base {{ row.data.code }}</span>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="id">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('id')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Id
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">
+                  {{ row.data.id }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="code">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('code')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Codigo
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="code-pill">{{ row.data.code }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="description">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('description')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Descripcion
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="description-cell">
+                  <span class="description-text">{{ row.data.description }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="createdAt">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection('createdAt')"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Creado
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="date-cell">
+                  {{ row.data.createdAt | date: 'yyyy-MM-dd HH:mm:ss' }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="actions">
+                <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef class="actions-column">
+                  Acciones
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="actions-column">
+                  <div class="row-actions">
+                    <button
+                      nbButton
+                      ghost
+                      status="info"
+                      size="small"
+                      class="action-button"
+                      type="button"
+                      title="Editar"
+                      aria-label="Editar registro"
+                      (click)="editTypeAccount(row.data.id)"
+                    >
+                      <nb-icon icon="edit-2-outline"></nb-icon>
+                    </button>
+
+                    @if (row.data.deletedAt) {
+                      <button
+                        nbButton
+                        ghost
+                        status="success"
+                        size="small"
+                        class="action-button"
+                        type="button"
+                        title="Restaurar"
+                        aria-label="Restaurar registro"
+                        (click)="restoreTypeAccount(row.data.id)"
+                        [disabled]="restoringId() === row.data.id"
+                      >
+                        <nb-icon icon="undo-outline"></nb-icon>
+                      </button>
+                    } @else {
+                      <button
+                        nbButton
+                        ghost
+                        status="danger"
+                        size="small"
+                        class="action-button"
+                        type="button"
+                        title="Eliminar"
+                        aria-label="Eliminar registro"
+                        (click)="deleteTypeAccount(row.data.id)"
+                        [disabled]="deletingId() === row.data.id"
+                      >
+                        <nb-icon icon="trash-2-outline"></nb-icon>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+            </table>
+          </div>
+
+          <div crudMobileContent class="mobile-list">
+            @for (typeAccount of typeAccounts(); track typeAccount.id) {
+              <article class="mobile-card">
+                <div class="mobile-card__header">
+                  <div class="mobile-card__identity">
+                    <strong>{{ typeAccount.name }}</strong>
+                    <span>{{ typeAccount.description }}</span>
+                  </div>
+
+                  <span class="code-pill">{{ typeAccount.code }}</span>
+                </div>
+
+                <div class="mobile-card__grid">
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Id</span>
+                    <span class="mobile-detail__value">{{ typeAccount.id }}</span>
+                  </div>
+                  <div class="mobile-detail mobile-detail--full">
+                    <span class="mobile-detail__label">Creado</span>
+                    <span class="mobile-detail__value">
+                      {{ typeAccount.createdAt | date: 'yyyy-MM-dd HH:mm:ss' }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="mobile-card__actions">
+                  <button
+                    nbButton
+                    ghost
+                    status="info"
+                    size="small"
+                    class="action-button"
+                    type="button"
+                    (click)="editTypeAccount(typeAccount.id)"
+                  >
+                    <nb-icon icon="edit-2-outline"></nb-icon>
+                    Editar
+                  </button>
+
+                  @if (typeAccount.deletedAt) {
+                    <button
+                      nbButton
+                      ghost
+                      status="success"
+                      size="small"
+                      class="action-button"
+                      type="button"
+                      (click)="restoreTypeAccount(typeAccount.id)"
+                      [disabled]="restoringId() === typeAccount.id"
+                    >
+                      <nb-icon icon="undo-outline"></nb-icon>
+                      Restaurar
+                    </button>
+                  } @else {
+                    <button
+                      nbButton
+                      ghost
+                      status="danger"
+                      size="small"
+                      class="action-button"
+                      type="button"
+                      (click)="deleteTypeAccount(typeAccount.id)"
+                      [disabled]="deletingId() === typeAccount.id"
+                    >
+                      <nb-icon icon="trash-2-outline"></nb-icon>
+                      Eliminar
+                    </button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+
+          <div crudEmptyState class="empty-state">
+            <nb-icon icon="book-open-outline"></nb-icon>
+            <h3>Sin registros</h3>
+            <p>
+              Todavia no hay tipos de cuentas para esta consulta. Usa el boton `Nuevo tipo`
+              para crear el primero.
+            </p>
+          </div>
+        </app-crud-collection-shell>
+      </app-crud-section-card>
+    </section>
+  }
+</section>

@@ -22,22 +22,18 @@
       (checkedChange)="onThemeToggle($event)"
       aria-label="Cambiar entre modo claro y oscuro"
     ></nb-toggle>
-    <button
-      nbButton
-      ghost
-      size="small"
-      class="notification-button"
-      aria-label="Notificaciones"
-    >
-      <nb-icon icon="bell-outline" class="notification-icon"></nb-icon>
+
+    <button nbButton ghost size="large" style="position: relative;" class="icon-ball" >
+      <nb-icon icon="bell-outline" [options]="{ animation: { type: 'zoom' } }" class="icon-ball"></nb-icon>
       <nb-badge
-        [text]="notificationCount.toString()"
-        status="danger"
-        position="top right"
-      ></nb-badge>
+          [text]="notificationCount.toString()"
+          status="danger"
+          position="top right"
+        ></nb-badge>
     </button>
+
+
     <nb-user
-      class="topbar-user"
       [name]="userName"
       [title]="userTitle"
       badgePosition="bottom right"

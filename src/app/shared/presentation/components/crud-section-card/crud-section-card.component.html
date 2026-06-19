@@ -1,0 +1,23 @@
+<nb-card class="crud-section-card">
+  <nb-card-header>
+    <div class="crud-section-card__copy">
+      @if (kicker()) {
+        <p class="crud-section-card__kicker">{{ kicker() }}</p>
+      }
+
+      <h2>{{ title() }}</h2>
+
+      @if (summary()) {
+        <p class="crud-section-card__summary">{{ summary() }}</p>
+      }
+    </div>
+
+    <div class="crud-section-card__actions">
+      <ng-content select="[crudSectionActions]"></ng-content>
+    </div>
+  </nb-card-header>
+
+  <nb-card-body [nbSpinner]="loading()">
+    <ng-content></ng-content>
+  </nb-card-body>
+</nb-card>

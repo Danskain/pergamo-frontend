@@ -24,16 +24,7 @@ export class AppShellSidebarComponent {
   );
   protected readonly activeItemTitle = signal('Dashboard');
   protected readonly menuItems = computed<NbMenuItem[]>(() =>
-    this.navigationItems().map((item) => ({
-      title: item.label,
-      link: item.path,
-      pathMatch: item.path === '/dashboard' ? 'full' : 'prefix',
-      home: item.path === '/dashboard',
-      icon: item.path === '/dashboard' ? 'home-outline' : 'briefcase-outline',
-      data: {
-        description: item.description
-      }
-    }))
+    this.navigationItems().map((item) => this.mapNavigationItem(item))
   );
 
   constructor() {
@@ -43,8 +34,25 @@ export class AppShellSidebarComponent {
         filter(({ tag }) => tag === this.menuTag),
         takeUntilDestroyed()
       )
-      .subscribe(({ item }) => {
+      .subscribe(({ item }: { item: NbMenuItem }) => {
         this.activeItemTitle.set(item.title);
       });
+  }
+
+  private mapNavigationItem(item: ShellNavigationItem): NbMenuItem {
+    const hasChildren = !!item.children?.length;
+
+    return {
+      title: item.label,
+      link: hasChildren ? undefined : item.path,
+      pathMatch: item.path === '/dashboard' ? 'full' : 'prefix',
+      home: item.path === '/dashboard',
+      expanded: hasChildren,
+      icon: item.icon ?? (item.path === '/dashboard' ? 'home-outline' : 'briefcase-outline'),
+      children: item.children?.map((child) => this.mapNavigationItem(child)),
+      data: {
+        description: item.description
+      }
+    };
   }
 }

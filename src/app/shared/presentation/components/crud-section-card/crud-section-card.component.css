@@ -1,0 +1,71 @@
+:host {
+  display: block;
+  animation: crud-section-enter 280ms ease-out both;
+}
+
+.crud-section-card {
+  border: 1px solid rgba(143, 155, 179, 0.14);
+}
+
+.crud-section-card nb-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.crud-section-card__copy :is(h2, p) {
+  margin: 0;
+}
+
+.crud-section-card__kicker {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #3366ff;
+}
+
+.crud-section-card__copy h2 {
+  font-size: 1.1rem;
+  line-height: 1.2;
+}
+
+.crud-section-card__summary {
+  font-size: 0.84rem;
+  line-height: 1.4;
+  max-width: 34rem;
+  color: #5a6782;
+}
+
+.crud-section-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+@keyframes crud-section-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .crud-section-card nb-card-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    animation: none;
+  }
+}

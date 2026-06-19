@@ -1,0 +1,523 @@
+<section class="documento-origen-page">
+  <app-crud-page-hero
+    eyebrow="Contabilidad / Documento Origen"
+    title="Documento Origen"
+    description="Administra los documentos origen y su integracion con estructura empresarial, modulo, tipo de documento, referencias y estados financieros."
+  >
+    <div crudHeroActions class="hero-actions">
+      <button nbButton status="primary" (click)="startCreate()">
+        <nb-icon icon="plus-outline"></nb-icon>
+        Nuevo documento origen
+      </button>
+
+      <button nbButton ghost status="basic" (click)="refreshData()">
+        <nb-icon icon="refresh-outline"></nb-icon>
+        Recargar
+      </button>
+    </div>
+  </app-crud-page-hero>
+
+  @if (showForm()) {
+    <section class="workspace-grid workspace-grid--form">
+      <app-crud-section-card
+        kicker="Formulario"
+        [title]="formTitle()"
+        [loading]="submitting() || selectedDocumentSourceResource.isLoading()"
+      >
+        <button
+          crudSectionActions
+          nbButton
+          ghost
+          status="basic"
+          type="button"
+          (click)="closeForm()"
+        >
+          Volver a la tabla
+        </button>
+
+        <form class="crud-form" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-grid">
+            <label class="field field--full">
+              <span class="field-label">Estructura empresarial</span>
+              <nb-select
+                fullWidth
+                formControlName="businessStructureId"
+                placeholder="Selecciona una estructura"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of businessStructureOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Modulo Pergamo</span>
+              <nb-select
+                fullWidth
+                formControlName="modulesId"
+                placeholder="Selecciona un modulo"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of moduleOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Tipo de documento</span>
+              <nb-select
+                fullWidth
+                formControlName="documentSourceTypeId"
+                placeholder="Selecciona un tipo"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of documentSourceTypeOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Numero documento origen</span>
+              <input
+                nbInput
+                fullWidth
+                formControlName="numberDocumentSource"
+                placeholder="Ej. DOC-2026-001"
+              />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Fecha documento</span>
+              <input nbInput fullWidth type="date" formControlName="documentDate" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Fecha contable</span>
+              <input nbInput fullWidth type="date" formControlName="accountingDate" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Referencia</span>
+              <nb-select
+                fullWidth
+                formControlName="referenceId"
+                placeholder="Selecciona una referencia"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of referenceOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Valor total</span>
+              <input
+                nbInput
+                fullWidth
+                type="number"
+                min="0"
+                step="0.01"
+                formControlName="totalValue"
+                placeholder="0.00"
+              />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Moneda</span>
+              <nb-select
+                fullWidth
+                formControlName="coinId"
+                placeholder="Selecciona una moneda"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of coinOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Estado financiero</span>
+              <nb-select
+                fullWidth
+                formControlName="financialStatementId"
+                placeholder="Selecciona un estado"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of financialStatementOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Documento contable</span>
+              <nb-select
+                fullWidth
+                formControlName="accountingDocumentId"
+                placeholder="Selecciona un documento"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of accountingDocumentOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Ejercicio</span>
+              <input
+                nbInput
+                fullWidth
+                type="number"
+                step="1"
+                formControlName="exercise"
+                placeholder="Ej. 2026"
+              />
+            </label>
+          </div>
+
+          <label class="field field--full">
+            <span class="field-label">Descripcion</span>
+            <textarea
+              nbInput
+              fullWidth
+              rows="4"
+              formControlName="description"
+              placeholder="Describe el contexto o detalle del documento origen"
+            ></textarea>
+          </label>
+
+          <div class="form-actions">
+            <button nbButton status="primary" type="submit" [disabled]="submitting()">
+              {{ submitLabel() }}
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="closeForm()">
+              Cancelar
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="startCreate()">
+              Limpiar formulario
+            </button>
+          </div>
+        </form>
+      </app-crud-section-card>
+    </section>
+  } @else {
+    <section class="workspace-grid workspace-grid--table">
+      <app-crud-section-card
+        kicker="Registros"
+        title="Tabla"
+        summary="Consulta, busca y administra todos los registros de documento origen."
+        [loading]="documentSourcesResource.isLoading()"
+      >
+        <app-crud-collection-shell
+          [hasItems]="documentSources().length > 0"
+          [pageSummary]="pageSummary()"
+          [currentPage]="pagination().currentPage"
+          [lastPage]="pagination().lastPage"
+          [canGoPrevious]="canGoPrevious()"
+          [canGoNext]="canGoNext()"
+          [perPage]="perPage()"
+          [perPageOptions]="perPageOptions()"
+          (previousPage)="goToPreviousPage()"
+          (nextPage)="goToNextPage()"
+          (perPageChange)="changePerPage($event)"
+        >
+          <label crudSearch class="search-field" for="document-source-search">
+            <span>Buscar</span>
+            <input
+              nbInput
+              fullWidth
+              id="document-source-search"
+              class="search-input"
+              placeholder="Buscar"
+              [nbFilterInput]="treeGridDataSource()"
+            />
+          </label>
+
+          <div crudDesktopContent class="table-shell">
+            <table
+              class="crud-tree-grid"
+              [nbTreeGrid]="treeGridDataSource()"
+              [nbSort]="treeGridDataSource()"
+              (sort)="changeSort($event)"
+            >
+              <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="treeGridAllColumns"></tr>
+              <tr nbTreeGridRow *nbTreeGridRowDef="let row; columns: treeGridAllColumns"></tr>
+
+              <ng-container [nbTreeGridColumnDef]="treeGridCustomColumn">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection(treeGridCustomColumn)"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Numero
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <div class="identity-cell">
+                    <div class="cell-stack">
+                      <strong>{{ row.data.numberDocumentSource }}</strong>
+                      <span>{{ row.data.businessStructureName }}</span>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="id">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('id')" *nbTreeGridHeaderCellDef>
+                  Id
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">
+                  {{ row.data.id }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="businessStructureName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('businessStructureName')" *nbTreeGridHeaderCellDef>
+                  Estructura
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.businessStructureName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="moduleName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('moduleName')" *nbTreeGridHeaderCellDef>
+                  Modulo
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.moduleName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="documentSourceTypeName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('documentSourceTypeName')" *nbTreeGridHeaderCellDef>
+                  Tipo
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.documentSourceTypeName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="accountingDocumentName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('accountingDocumentName')" *nbTreeGridHeaderCellDef>
+                  Doc. contable
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.accountingDocumentName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="financialStatementName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('financialStatementName')" *nbTreeGridHeaderCellDef>
+                  Estado financiero
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.financialStatementName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="totalValue">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('totalValue')" *nbTreeGridHeaderCellDef>
+                  Valor total
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.totalValue | number: '1.2-2' }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="documentDate">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('documentDate')" *nbTreeGridHeaderCellDef>
+                  Fecha doc.
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="date-cell">
+                  {{ row.data.documentDate | date: 'yyyy-MM-dd' }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="accountingDate">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('accountingDate')" *nbTreeGridHeaderCellDef>
+                  Fecha contable
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="date-cell">
+                  {{ row.data.accountingDate | date: 'yyyy-MM-dd' }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="exercise">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('exercise')" *nbTreeGridHeaderCellDef>
+                  Ejercicio
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">
+                  {{ row.data.exercise }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="createdAt">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('createdAt')" *nbTreeGridHeaderCellDef>
+                  Creado
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="date-cell">
+                  {{ row.data.createdAt | date: 'yyyy-MM-dd HH:mm:ss' }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="actions">
+                <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef class="actions-column">Acciones</th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="actions-column">
+                  <div class="row-actions">
+                    <button
+                      nbButton
+                      ghost
+                      status="info"
+                      size="small"
+                      class="action-button"
+                      type="button"
+                      title="Editar"
+                      aria-label="Editar registro"
+                      (click)="editDocumentSource(row.data.id)"
+                    >
+                      <nb-icon icon="edit-2-outline"></nb-icon>
+                    </button>
+
+                    @if (row.data.deletedAt) {
+                      <button
+                        nbButton
+                        ghost
+                        status="success"
+                        size="small"
+                        class="action-button"
+                        type="button"
+                        title="Restaurar"
+                        aria-label="Restaurar registro"
+                        (click)="restoreDocumentSource(row.data.id)"
+                        [disabled]="restoringId() === row.data.id"
+                      >
+                        <nb-icon icon="undo-outline"></nb-icon>
+                      </button>
+                    } @else {
+                      <button
+                        nbButton
+                        ghost
+                        status="danger"
+                        size="small"
+                        class="action-button"
+                        type="button"
+                        title="Eliminar"
+                        aria-label="Eliminar registro"
+                        (click)="deleteDocumentSource(row.data.id)"
+                        [disabled]="deletingId() === row.data.id"
+                      >
+                        <nb-icon icon="trash-2-outline"></nb-icon>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+            </table>
+          </div>
+
+          <div crudMobileContent class="mobile-list">
+            @for (documentSource of documentSources(); track documentSource.id) {
+              <article class="mobile-card">
+                <div class="mobile-card__header">
+                  <div class="mobile-card__identity">
+                    <strong>{{ documentSource.numberDocumentSource }}</strong>
+                    <span>
+                      {{ documentSource.documentSourceType?.name ?? 'Id ' + documentSource.documentSourceTypeId }}
+                    </span>
+                  </div>
+                  <span class="code-pill">{{ documentSource.totalValue | number: '1.2-2' }}</span>
+                </div>
+
+                <div class="mobile-card__grid">
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Id</span>
+                    <span class="mobile-detail__value">{{ documentSource.id }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Modulo</span>
+                    <span class="mobile-detail__value">{{ documentSource.moduleItem?.name ?? 'Id ' + documentSource.modulesId }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Documento contable</span>
+                    <span class="mobile-detail__value">
+                      {{ documentSource.accountingDocument?.name ?? 'Id ' + documentSource.accountingDocumentId }}
+                    </span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Estado financiero</span>
+                    <span class="mobile-detail__value">
+                      {{ documentSource.financialStatement?.name ?? 'Id ' + documentSource.financialStatementId }}
+                    </span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Fecha doc.</span>
+                    <span class="mobile-detail__value">{{ documentSource.documentDate | date: 'yyyy-MM-dd' }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Fecha contable</span>
+                    <span class="mobile-detail__value">{{ documentSource.accountingDate | date: 'yyyy-MM-dd' }}</span>
+                  </div>
+                </div>
+
+                <div class="mobile-card__actions">
+                  <button
+                    nbButton
+                    ghost
+                    status="info"
+                    size="small"
+                    class="action-button"
+                    type="button"
+                    (click)="editDocumentSource(documentSource.id)"
+                  >
+                    <nb-icon icon="edit-2-outline"></nb-icon>
+                    Editar
+                  </button>
+
+                  @if (documentSource.deletedAt) {
+                    <button
+                      nbButton
+                      ghost
+                      status="success"
+                      size="small"
+                      class="action-button"
+                      type="button"
+                      (click)="restoreDocumentSource(documentSource.id)"
+                      [disabled]="restoringId() === documentSource.id"
+                    >
+                      <nb-icon icon="undo-outline"></nb-icon>
+                      Restaurar
+                    </button>
+                  } @else {
+                    <button
+                      nbButton
+                      ghost
+                      status="danger"
+                      size="small"
+                      class="action-button"
+                      type="button"
+                      (click)="deleteDocumentSource(documentSource.id)"
+                      [disabled]="deletingId() === documentSource.id"
+                    >
+                      <nb-icon icon="trash-2-outline"></nb-icon>
+                      Eliminar
+                    </button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+
+          <div crudEmptyState class="empty-state">
+            <nb-icon icon="file-text-outline"></nb-icon>
+            <h3>Sin registros</h3>
+            <p>
+              Todavia no hay documentos origen para esta consulta. Usa el boton
+              `Nuevo documento origen` para crear el primero.
+            </p>
+          </div>
+        </app-crud-collection-shell>
+      </app-crud-section-card>
+    </section>
+  }
+</section>

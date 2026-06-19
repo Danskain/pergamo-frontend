@@ -1,0 +1,452 @@
+<section class="cabecera-asiento-contable-page">
+  <app-crud-page-hero
+    eyebrow="Contabilidad / Cabecera Asiento Contable"
+    title="Cabecera Asiento Contable"
+    description="Administra las cabeceras de asiento contable y su integracion con estructura empresarial, documento contable, moneda y documento origen."
+  >
+    <div crudHeroActions class="hero-actions">
+      <button nbButton status="primary" (click)="startCreate()">
+        <nb-icon icon="plus-outline"></nb-icon>
+        Nueva cabecera
+      </button>
+
+      <button nbButton ghost status="basic" (click)="refreshData()">
+        <nb-icon icon="refresh-outline"></nb-icon>
+        Recargar
+      </button>
+    </div>
+  </app-crud-page-hero>
+
+  @if (showForm()) {
+    <section class="workspace-grid workspace-grid--form">
+      <app-crud-section-card
+        kicker="Formulario"
+        [title]="formTitle()"
+        [loading]="submitting() || selectedAccountingEntryHeaderResource.isLoading()"
+      >
+        <button
+          crudSectionActions
+          nbButton
+          ghost
+          status="basic"
+          type="button"
+          (click)="closeForm()"
+        >
+          Volver a la tabla
+        </button>
+
+        <form class="crud-form" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-grid">
+            <label class="field field--full">
+              <span class="field-label">Estructura empresarial</span>
+              <nb-select
+                fullWidth
+                formControlName="businessStructureId"
+                placeholder="Selecciona una estructura"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of businessStructureOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Documento contable</span>
+              <nb-select
+                fullWidth
+                formControlName="accountingDocumentId"
+                placeholder="Selecciona un documento"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of accountingDocumentOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Periodo contable</span>
+              <input
+                nbInput
+                fullWidth
+                type="number"
+                step="1"
+                formControlName="accountingPeriod"
+                placeholder="Ej. 202601"
+              />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Moneda</span>
+              <nb-select
+                fullWidth
+                formControlName="coinId"
+                placeholder="Selecciona una moneda"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of coinOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Documento origen</span>
+              <nb-select
+                fullWidth
+                formControlName="documentsSourceId"
+                placeholder="Selecciona un documento origen"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of documentSourceOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Referencia documento</span>
+              <input
+                nbInput
+                fullWidth
+                formControlName="referenceDocument"
+                placeholder="Ej. REF-2026-001"
+              />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Total debitos</span>
+              <input
+                nbInput
+                fullWidth
+                type="number"
+                min="0"
+                step="0.01"
+                formControlName="totalDebits"
+                placeholder="0.00"
+              />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Total creditos</span>
+              <input
+                nbInput
+                fullWidth
+                type="number"
+                min="0"
+                step="0.01"
+                formControlName="totalCredits"
+                placeholder="0.00"
+              />
+            </label>
+          </div>
+
+          <label class="field field--full">
+            <span class="field-label">Descripcion</span>
+            <textarea
+              nbInput
+              fullWidth
+              rows="4"
+              formControlName="description"
+              placeholder="Describe el contexto del asiento contable"
+            ></textarea>
+          </label>
+
+          <div class="form-actions">
+            <button nbButton status="primary" type="submit" [disabled]="submitting()">
+              {{ submitLabel() }}
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="closeForm()">
+              Cancelar
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="startCreate()">
+              Limpiar formulario
+            </button>
+          </div>
+        </form>
+      </app-crud-section-card>
+    </section>
+  } @else {
+    <section class="workspace-grid workspace-grid--table">
+      <app-crud-section-card
+        kicker="Registros"
+        title="Tabla"
+        summary="Consulta, busca y administra todos los registros de cabecera asiento contable."
+        [loading]="accountingEntryHeadersResource.isLoading()"
+      >
+        <app-crud-collection-shell
+          [hasItems]="accountingEntryHeaders().length > 0"
+          [pageSummary]="pageSummary()"
+          [currentPage]="pagination().currentPage"
+          [lastPage]="pagination().lastPage"
+          [canGoPrevious]="canGoPrevious()"
+          [canGoNext]="canGoNext()"
+          [perPage]="perPage()"
+          [perPageOptions]="perPageOptions()"
+          (previousPage)="goToPreviousPage()"
+          (nextPage)="goToNextPage()"
+          (perPageChange)="changePerPage($event)"
+        >
+          <label crudSearch class="search-field" for="accounting-entry-header-search">
+            <span>Buscar</span>
+            <input
+              nbInput
+              fullWidth
+              id="accounting-entry-header-search"
+              class="search-input"
+              placeholder="Buscar"
+              [nbFilterInput]="treeGridDataSource()"
+            />
+          </label>
+
+          <div crudDesktopContent class="table-shell">
+            <table
+              class="crud-tree-grid"
+              [nbTreeGrid]="treeGridDataSource()"
+              [nbSort]="treeGridDataSource()"
+              (sort)="changeSort($event)"
+            >
+              <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="treeGridAllColumns"></tr>
+              <tr nbTreeGridRow *nbTreeGridRowDef="let row; columns: treeGridAllColumns"></tr>
+
+              <ng-container [nbTreeGridColumnDef]="treeGridCustomColumn">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection(treeGridCustomColumn)"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Referencia
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <div class="identity-cell">
+                    <div class="cell-stack">
+                      <strong>{{ row.data.referenceDocument }}</strong>
+                      <span>{{ row.data.businessStructureName }}</span>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="id">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('id')" *nbTreeGridHeaderCellDef>
+                  Id
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">
+                  {{ row.data.id }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="businessStructureName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('businessStructureName')" *nbTreeGridHeaderCellDef>
+                  Estructura
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.businessStructureName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="accountingDocumentName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('accountingDocumentName')" *nbTreeGridHeaderCellDef>
+                  Documento contable
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.accountingDocumentName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="documentSourceName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('documentSourceName')" *nbTreeGridHeaderCellDef>
+                  Documento origen
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.documentSourceName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="accountingPeriod">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('accountingPeriod')" *nbTreeGridHeaderCellDef>
+                  Periodo
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">
+                  {{ row.data.accountingPeriod }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="totalDebits">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('totalDebits')" *nbTreeGridHeaderCellDef>
+                  Debitos
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.totalDebits | number: '1.2-2' }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="totalCredits">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('totalCredits')" *nbTreeGridHeaderCellDef>
+                  Creditos
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.totalCredits | number: '1.2-2' }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="coinName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('coinName')" *nbTreeGridHeaderCellDef>
+                  Moneda
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.coinName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="createdAt">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('createdAt')" *nbTreeGridHeaderCellDef>
+                  Creado
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="date-cell">
+                  {{ row.data.createdAt | date: 'yyyy-MM-dd HH:mm:ss' }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="actions">
+                <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef class="actions-column">Acciones</th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="actions-column">
+                  <div class="row-actions">
+                    <button
+                      nbButton
+                      ghost
+                      status="info"
+                      size="small"
+                      class="action-button"
+                      type="button"
+                      title="Editar"
+                      aria-label="Editar registro"
+                      (click)="editAccountingEntryHeader(row.data.id)"
+                    >
+                      <nb-icon icon="edit-2-outline"></nb-icon>
+                    </button>
+
+                    @if (row.data.deletedAt) {
+                      <button
+                        nbButton
+                        ghost
+                        status="success"
+                        size="small"
+                        class="action-button"
+                        type="button"
+                        title="Restaurar"
+                        aria-label="Restaurar registro"
+                        (click)="restoreAccountingEntryHeader(row.data.id)"
+                        [disabled]="restoringId() === row.data.id"
+                      >
+                        <nb-icon icon="undo-outline"></nb-icon>
+                      </button>
+                    } @else {
+                      <button
+                        nbButton
+                        ghost
+                        status="danger"
+                        size="small"
+                        class="action-button"
+                        type="button"
+                        title="Eliminar"
+                        aria-label="Eliminar registro"
+                        (click)="deleteAccountingEntryHeader(row.data.id)"
+                        [disabled]="deletingId() === row.data.id"
+                      >
+                        <nb-icon icon="trash-2-outline"></nb-icon>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+            </table>
+          </div>
+
+          <div crudMobileContent class="mobile-list">
+            @for (accountingEntryHeader of accountingEntryHeaders(); track accountingEntryHeader.id) {
+              <article class="mobile-card">
+                <div class="mobile-card__header">
+                  <div class="mobile-card__identity">
+                    <strong>{{ accountingEntryHeader.referenceDocument }}</strong>
+                    <span>{{ accountingEntryHeader.accountingDocument?.name ?? 'Id ' + accountingEntryHeader.accountingDocumentId }}</span>
+                  </div>
+                </div>
+
+                <div class="mobile-card__grid">
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Id</span>
+                    <span class="mobile-detail__value">{{ accountingEntryHeader.id }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Periodo</span>
+                    <span class="mobile-detail__value">{{ accountingEntryHeader.accountingPeriod }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Debitos</span>
+                    <span class="mobile-detail__value">{{ accountingEntryHeader.totalDebits | number: '1.2-2' }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Creditos</span>
+                    <span class="mobile-detail__value">{{ accountingEntryHeader.totalCredits | number: '1.2-2' }}</span>
+                  </div>
+                  <div class="mobile-detail mobile-detail--full">
+                    <span class="mobile-detail__label">Documento origen</span>
+                    <span class="mobile-detail__value">{{ accountingEntryHeader.documentSource?.label ?? accountingEntryHeader.documentSource?.name ?? 'Id ' + accountingEntryHeader.documentsSourceId }}</span>
+                  </div>
+                </div>
+
+                <div class="mobile-card__actions">
+                  <button
+                    nbButton
+                    ghost
+                    status="info"
+                    size="small"
+                    class="action-button"
+                    type="button"
+                    (click)="editAccountingEntryHeader(accountingEntryHeader.id)"
+                  >
+                    <nb-icon icon="edit-2-outline"></nb-icon>
+                    Editar
+                  </button>
+
+                  @if (accountingEntryHeader.deletedAt) {
+                    <button
+                      nbButton
+                      ghost
+                      status="success"
+                      size="small"
+                      class="action-button"
+                      type="button"
+                      (click)="restoreAccountingEntryHeader(accountingEntryHeader.id)"
+                      [disabled]="restoringId() === accountingEntryHeader.id"
+                    >
+                      <nb-icon icon="undo-outline"></nb-icon>
+                      Restaurar
+                    </button>
+                  } @else {
+                    <button
+                      nbButton
+                      ghost
+                      status="danger"
+                      size="small"
+                      class="action-button"
+                      type="button"
+                      (click)="deleteAccountingEntryHeader(accountingEntryHeader.id)"
+                      [disabled]="deletingId() === accountingEntryHeader.id"
+                    >
+                      <nb-icon icon="trash-2-outline"></nb-icon>
+                      Eliminar
+                    </button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+
+          <div crudEmptyState class="empty-state">
+            <nb-icon icon="file-outline"></nb-icon>
+            <h3>Sin registros</h3>
+            <p>
+              Todavia no hay cabeceras de asiento contable para esta consulta. Usa el boton
+              `Nueva cabecera` para crear la primera.
+            </p>
+          </div>
+        </app-crud-collection-shell>
+      </app-crud-section-card>
+    </section>
+  }
+</section>

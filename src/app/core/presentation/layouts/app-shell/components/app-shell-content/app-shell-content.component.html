@@ -1,3 +1,8 @@
 <div class="shell-content">
-  <router-outlet />
+  <div
+    class="shell-content__viewport"
+    [class.shell-content__viewport--animating]="isAnimating()"
+  >
+    <router-outlet #outlet="outlet"></router-outlet>
+  </div>
 </div>
