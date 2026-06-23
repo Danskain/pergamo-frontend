@@ -1,0 +1,388 @@
+<section class="clave-operacion-page">
+  <app-crud-page-hero
+    eyebrow="Contabilidad / Clave Operacion"
+    title="Clave Operacion"
+    description="Administra las claves de operacion disponibles dentro del modulo de contabilidad y su relacion con el modulo y la naturaleza contable."
+  >
+    <div crudHeroActions class="hero-actions">
+      <button nbButton status="primary" (click)="startCreate()">
+        <nb-icon icon="plus-outline"></nb-icon>
+        Nueva clave
+      </button>
+
+      <button nbButton ghost status="basic" (click)="refreshData()">
+        <nb-icon icon="refresh-outline"></nb-icon>
+        Recargar
+      </button>
+    </div>
+  </app-crud-page-hero>
+
+  @if (showForm()) {
+    <section class="workspace-grid workspace-grid--form">
+      <app-crud-section-card
+        kicker="Formulario"
+        [title]="formTitle()"
+        [loading]="submitting() || selectedKeyOperationResource.isLoading()"
+      >
+        <button
+          crudSectionActions
+          nbButton
+          ghost
+          status="basic"
+          type="button"
+          (click)="closeForm()"
+        >
+          Volver a la tabla
+        </button>
+
+        <form class="crud-form" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-grid">
+            <label class="field">
+              <span class="field-label">Codigo</span>
+              <input nbInput fullWidth formControlName="code" placeholder="Ej. OP-001" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Nombre</span>
+              <input
+                nbInput
+                fullWidth
+                formControlName="name"
+                placeholder="Ej. Compra gravada"
+              />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Modulo</span>
+              <nb-select
+                fullWidth
+                formControlName="moduleId"
+                placeholder="Selecciona un modulo"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of moduleOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+              @if (!selectOptionsResource.isLoading() && moduleOptions().length === 0) {
+                <span class="field-hint">No hay modulos disponibles para seleccionar.</span>
+              }
+            </label>
+
+            <label class="field">
+              <span class="field-label">Naturaleza contable</span>
+              <nb-select
+                fullWidth
+                formControlName="accountingNatureId"
+                placeholder="Selecciona una naturaleza"
+                scrollStrategy="reposition"
+                [disabled]="selectOptionsResource.isLoading()"
+              >
+                @for (option of accountingNatureOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+              @if (
+                !selectOptionsResource.isLoading() &&
+                accountingNatureOptions().length === 0
+              ) {
+                <span class="field-hint">
+                  No hay naturalezas contables disponibles para seleccionar.
+                </span>
+              }
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Afecta impuestos</p>
+              <p class="toggle-copy">
+                Activa esta opcion si la clave de operacion impacta calculos o procesos de impuestos.
+              </p>
+            </div>
+            <nb-toggle formControlName="affectsTaxes"></nb-toggle>
+          </div>
+
+          <div class="form-actions">
+            <button nbButton status="primary" type="submit" [disabled]="submitting()">
+              {{ submitLabel() }}
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="closeForm()">
+              Cancelar
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="startCreate()">
+              Limpiar formulario
+            </button>
+          </div>
+        </form>
+      </app-crud-section-card>
+    </section>
+  } @else {
+    <section class="workspace-grid workspace-grid--table">
+      <app-crud-section-card
+        kicker="Registros"
+        title="Tabla"
+        summary="Consulta, busca y administra todos los registros de clave operacion."
+        [loading]="keyOperationsResource.isLoading()"
+      >
+        <app-crud-collection-shell
+          [hasItems]="keyOperations().length > 0"
+          [pageSummary]="pageSummary()"
+          [currentPage]="pagination().currentPage"
+          [lastPage]="pagination().lastPage"
+          [canGoPrevious]="canGoPrevious()"
+          [canGoNext]="canGoNext()"
+          [perPage]="perPage()"
+          [perPageOptions]="perPageOptions()"
+          (previousPage)="goToPreviousPage()"
+          (nextPage)="goToNextPage()"
+          (perPageChange)="changePerPage($event)"
+        >
+          <label crudSearch class="search-field" for="key-operation-search">
+            <span>Buscar</span>
+            <input
+              nbInput
+              fullWidth
+              id="key-operation-search"
+              class="search-input"
+              placeholder="Buscar"
+              [nbFilterInput]="treeGridDataSource()"
+            />
+          </label>
+
+          <div crudDesktopContent class="table-shell">
+            <table
+              class="crud-tree-grid"
+              [nbTreeGrid]="treeGridDataSource()"
+              [nbSort]="treeGridDataSource()"
+              (sort)="changeSort($event)"
+            >
+              <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="treeGridAllColumns"></tr>
+              <tr nbTreeGridRow *nbTreeGridRowDef="let row; columns: treeGridAllColumns"></tr>
+
+              <ng-container [nbTreeGridColumnDef]="treeGridCustomColumn">
+                <th
+                  nbTreeGridHeaderCell
+                  [nbSortHeader]="getSortDirection(treeGridCustomColumn)"
+                  *nbTreeGridHeaderCellDef
+                >
+                  Nombre
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <div class="identity-cell">
+                    <div class="cell-stack">
+                      <strong>{{ row.data.name }}</strong>
+                      <span>{{ row.data.moduleName }}</span>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="id">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('id')" *nbTreeGridHeaderCellDef>
+                  Id
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">
+                  {{ row.data.id }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="code">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('code')" *nbTreeGridHeaderCellDef>
+                  Codigo
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="code-pill">{{ row.data.code }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="moduleName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('moduleName')" *nbTreeGridHeaderCellDef>
+                  Modulo
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.moduleName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="accountingNatureName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('accountingNatureName')" *nbTreeGridHeaderCellDef>
+                  Naturaleza
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.accountingNatureName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="affectsTaxes">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('affectsTaxes')" *nbTreeGridHeaderCellDef>
+                  Impuestos
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="status-pill" [class.status-pill--positive]="row.data.affectsTaxes">
+                    {{ row.data.affectsTaxes ? 'Si' : 'No' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="createdAt">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('createdAt')" *nbTreeGridHeaderCellDef>
+                  Creado
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="date-cell">
+                  {{ row.data.createdAt | date: 'yyyy-MM-dd HH:mm:ss' }}
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="actions">
+                <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef class="actions-column">Acciones</th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="actions-column">
+                  <div class="row-actions">
+                    <button
+                      nbButton
+                      ghost
+                      status="info"
+                      size="small"
+                      class="action-button"
+                      type="button"
+                      title="Editar"
+                      aria-label="Editar registro"
+                      (click)="editKeyOperation(row.data.id)"
+                    >
+                      <nb-icon icon="edit-2-outline"></nb-icon>
+                    </button>
+
+                    @if (row.data.deletedAt) {
+                      <button
+                        nbButton
+                        ghost
+                        status="success"
+                        size="small"
+                        class="action-button"
+                        type="button"
+                        title="Restaurar"
+                        aria-label="Restaurar registro"
+                        (click)="restoreKeyOperation(row.data.id)"
+                        [disabled]="restoringId() === row.data.id"
+                      >
+                        <nb-icon icon="undo-outline"></nb-icon>
+                      </button>
+                    } @else {
+                      <button
+                        nbButton
+                        ghost
+                        status="danger"
+                        size="small"
+                        class="action-button"
+                        type="button"
+                        title="Eliminar"
+                        aria-label="Eliminar registro"
+                        (click)="deleteKeyOperation(row.data.id)"
+                        [disabled]="deletingId() === row.data.id"
+                      >
+                        <nb-icon icon="trash-2-outline"></nb-icon>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+            </table>
+          </div>
+
+          <div crudMobileContent class="mobile-list">
+            @for (keyOperation of keyOperations(); track keyOperation.id) {
+              <article class="mobile-card">
+                <div class="mobile-card__header">
+                  <div class="mobile-card__identity">
+                    <strong>{{ keyOperation.name }}</strong>
+                    <span>{{ keyOperation.code }}</span>
+                  </div>
+                </div>
+
+                <div class="mobile-card__grid">
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Id</span>
+                    <span class="mobile-detail__value">{{ keyOperation.id }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Modulo</span>
+                    <span class="mobile-detail__value">
+                      {{ keyOperation.module?.label ?? keyOperation.module?.name ?? 'Id ' + keyOperation.moduleId }}
+                    </span>
+                  </div>
+                  <div class="mobile-detail mobile-detail--full">
+                    <span class="mobile-detail__label">Naturaleza</span>
+                    <span class="mobile-detail__value">
+                      {{ keyOperation.accountingNature?.label ?? keyOperation.accountingNature?.name ?? 'Id ' + keyOperation.accountingNatureId }}
+                    </span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Impuestos</span>
+                    <span class="mobile-detail__value">{{ keyOperation.affectsTaxes ? 'Si' : 'No' }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Creado</span>
+                    <span class="mobile-detail__value">
+                      {{ keyOperation.createdAt | date: 'yyyy-MM-dd HH:mm:ss' }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="mobile-card__actions">
+                  <button
+                    nbButton
+                    ghost
+                    status="info"
+                    size="small"
+                    class="action-button"
+                    type="button"
+                    (click)="editKeyOperation(keyOperation.id)"
+                  >
+                    <nb-icon icon="edit-2-outline"></nb-icon>
+                    Editar
+                  </button>
+
+                  @if (keyOperation.deletedAt) {
+                    <button
+                      nbButton
+                      ghost
+                      status="success"
+                      size="small"
+                      class="action-button"
+                      type="button"
+                      (click)="restoreKeyOperation(keyOperation.id)"
+                      [disabled]="restoringId() === keyOperation.id"
+                    >
+                      <nb-icon icon="undo-outline"></nb-icon>
+                      Restaurar
+                    </button>
+                  } @else {
+                    <button
+                      nbButton
+                      ghost
+                      status="danger"
+                      size="small"
+                      class="action-button"
+                      type="button"
+                      (click)="deleteKeyOperation(keyOperation.id)"
+                      [disabled]="deletingId() === keyOperation.id"
+                    >
+                      <nb-icon icon="trash-2-outline"></nb-icon>
+                      Eliminar
+                    </button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+
+          <div crudEmptyState class="empty-state">
+            <nb-icon icon="keypad-outline"></nb-icon>
+            <h3>Sin registros</h3>
+            <p>
+              Todavia no hay claves de operacion para esta consulta. Usa el boton `Nueva clave`
+              para crear la primera.
+            </p>
+          </div>
+        </app-crud-collection-shell>
+      </app-crud-section-card>
+    </section>
+  }
+</section>

@@ -171,6 +171,30 @@ export class AppShellLayoutComponent {
           icon: 'list-outline',
           path: '/contabilidad/posicion-asiento-contable',
           description: 'Submodulo Posicion Asiento Contable de contabilidad'
+        },
+        {
+          label: 'Clave Operacion',
+          icon: 'keypad-outline',
+          path: '/contabilidad/clave-operacion',
+          description: 'Submodulo Clave Operacion de contabilidad'
+        },
+        {
+          label: 'Momento Contable',
+          icon: 'clock-outline',
+          path: '/contabilidad/momento-contable',
+          description: 'Submodulo Momento Contable de contabilidad'
+        },
+        {
+          label: 'Evento Contable',
+          icon: 'flash-outline',
+          path: '/contabilidad/evento-contable',
+          description: 'Submodulo Evento Contable de contabilidad'
+        },
+        {
+          label: 'Esquema Contable',
+          icon: 'layers-outline',
+          path: '/contabilidad/esquema-contable',
+          description: 'Submodulo Esquema Contable de contabilidad'
         }
       ]
     }

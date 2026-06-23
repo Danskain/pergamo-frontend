@@ -6,17 +6,21 @@ import { ACCOUNTING_STANDARD_REPOSITORY } from './application/ports/accounting-s
 import { ACCOUNT_CLASS_REPOSITORY } from './application/ports/account-class.repository';
 import { ACCOUNTING_ACCOUNT_REPOSITORY } from './application/ports/accounting-account.repository';
 import { ACCOUNTING_DOCUMENT_REPOSITORY } from './application/ports/accounting-document.repository';
+import { ACCOUNTING_EVENT_REPOSITORY } from './application/ports/accounting-event.repository';
 import { ACCOUNTING_ENTRY_HEADER_REPOSITORY } from './application/ports/accounting-entry-header.repository';
 import { ACCOUNTING_ENTRY_POSITION_REPOSITORY } from './application/ports/accounting-entry-position.repository';
 import { ACCOUNTING_GROUP_REPOSITORY } from './application/ports/accounting-group.repository';
+import { ACCOUNTING_SCHEME_REPOSITORY } from './application/ports/accounting-scheme.repository';
 import { ACCOUNTING_SUMMARY_REPOSITORY } from './application/ports/accounting-summary.repository';
 import { BUSINESS_STRUCTURE_REPOSITORY } from './application/ports/business-structure.repository';
 import { CHART_ACCOUNT_REPOSITORY } from './application/ports/chart-account.repository';
 import { COST_CENTER_REPOSITORY } from './application/ports/cost-center.repository';
 import { COST_CENTER_CLASS_REPOSITORY } from './application/ports/cost-center-class.repository';
 import { COST_CENTER_NATURE_REPOSITORY } from './application/ports/cost-center-nature.repository';
+import { KEY_OPERATION_REPOSITORY } from './application/ports/key-operation.repository';
 import { DOCUMENT_SOURCE_REPOSITORY } from './application/ports/document-source.repository';
 import { DOCUMENT_SOURCE_TYPE_REPOSITORY } from './application/ports/document-source-type.repository';
+import { ACCOUNTING_MOMENT_REPOSITORY } from './application/ports/accounting-moment.repository';
 import { COST_CENTER_TYPE_REPOSITORY } from './application/ports/cost-center-type.repository';
 import { EXERCISE_VARIATION_REPOSITORY } from './application/ports/exercise-variation.repository';
 import { FINANCIAL_STATEMENT_REPOSITORY } from './application/ports/financial-statement.repository';
@@ -27,10 +31,13 @@ import { TYPE_PLAN_REPOSITORY } from './application/ports/type-plan.repository';
 import { CreateAccountClassUseCase } from './application/use-cases/create-account-class.use-case';
 import { CreateAccountingAccountUseCase } from './application/use-cases/create-accounting-account.use-case';
 import { CreateAccountingDocumentUseCase } from './application/use-cases/create-accounting-document.use-case';
+import { CreateAccountingEventUseCase } from './application/use-cases/create-accounting-event.use-case';
 import { CreateAccountingEntryHeaderUseCase } from './application/use-cases/create-accounting-entry-header.use-case';
 import { CreateAccountingEntryPositionUseCase } from './application/use-cases/create-accounting-entry-position.use-case';
 import { CreateAccountingGroupUseCase } from './application/use-cases/create-accounting-group.use-case';
+import { CreateAccountingMomentUseCase } from './application/use-cases/create-accounting-moment.use-case';
 import { CreateAccountingNatureUseCase } from './application/use-cases/create-accounting-nature.use-case';
+import { CreateAccountingSchemeUseCase } from './application/use-cases/create-accounting-scheme.use-case';
 import { CreateAccountingStandardUseCase } from './application/use-cases/create-accounting-standard.use-case';
 import { CreateBusinessStructureUseCase } from './application/use-cases/create-business-structure.use-case';
 import { CreateCostCenterClassUseCase } from './application/use-cases/create-cost-center-class.use-case';
@@ -40,6 +47,7 @@ import { CreateCostCenterTypeUseCase } from './application/use-cases/create-cost
 import { CreateDocumentSourceUseCase } from './application/use-cases/create-document-source.use-case';
 import { CreateDocumentSourceTypeUseCase } from './application/use-cases/create-document-source-type.use-case';
 import { CreateFinancialStatementUseCase } from './application/use-cases/create-financial-statement.use-case';
+import { CreateKeyOperationUseCase } from './application/use-cases/create-key-operation.use-case';
 import { CreatePergamoModuleUseCase } from './application/use-cases/create-pergamo-module.use-case';
 import { CreateReferenceUseCase } from './application/use-cases/create-reference.use-case';
 import { CreateTypeAccountUseCase } from './application/use-cases/create-type-account.use-case';
@@ -47,10 +55,13 @@ import { GetAccountingSelectOptionsUseCase } from './application/use-cases/get-a
 import { DeleteAccountClassUseCase } from './application/use-cases/delete-account-class.use-case';
 import { DeleteAccountingAccountUseCase } from './application/use-cases/delete-accounting-account.use-case';
 import { DeleteAccountingDocumentUseCase } from './application/use-cases/delete-accounting-document.use-case';
+import { DeleteAccountingEventUseCase } from './application/use-cases/delete-accounting-event.use-case';
 import { DeleteAccountingEntryHeaderUseCase } from './application/use-cases/delete-accounting-entry-header.use-case';
 import { DeleteAccountingEntryPositionUseCase } from './application/use-cases/delete-accounting-entry-position.use-case';
 import { DeleteAccountingGroupUseCase } from './application/use-cases/delete-accounting-group.use-case';
+import { DeleteAccountingMomentUseCase } from './application/use-cases/delete-accounting-moment.use-case';
 import { DeleteAccountingNatureUseCase } from './application/use-cases/delete-accounting-nature.use-case';
+import { DeleteAccountingSchemeUseCase } from './application/use-cases/delete-accounting-scheme.use-case';
 import { DeleteAccountingStandardUseCase } from './application/use-cases/delete-accounting-standard.use-case';
 import { DeleteBusinessStructureUseCase } from './application/use-cases/delete-business-structure.use-case';
 import { DeleteCostCenterClassUseCase } from './application/use-cases/delete-cost-center-class.use-case';
@@ -60,16 +71,20 @@ import { DeleteCostCenterTypeUseCase } from './application/use-cases/delete-cost
 import { DeleteDocumentSourceUseCase } from './application/use-cases/delete-document-source.use-case';
 import { DeleteDocumentSourceTypeUseCase } from './application/use-cases/delete-document-source-type.use-case';
 import { DeleteFinancialStatementUseCase } from './application/use-cases/delete-financial-statement.use-case';
+import { DeleteKeyOperationUseCase } from './application/use-cases/delete-key-operation.use-case';
 import { DeletePergamoModuleUseCase } from './application/use-cases/delete-pergamo-module.use-case';
 import { DeleteReferenceUseCase } from './application/use-cases/delete-reference.use-case';
 import { DeleteTypeAccountUseCase } from './application/use-cases/delete-type-account.use-case';
 import { GetAccountClassDetailUseCase } from './application/use-cases/get-account-class-detail.use-case';
 import { GetAccountingAccountDetailUseCase } from './application/use-cases/get-accounting-account-detail.use-case';
 import { GetAccountingDocumentDetailUseCase } from './application/use-cases/get-accounting-document-detail.use-case';
+import { GetAccountingEventDetailUseCase } from './application/use-cases/get-accounting-event-detail.use-case';
 import { GetAccountingEntryHeaderDetailUseCase } from './application/use-cases/get-accounting-entry-header-detail.use-case';
 import { GetAccountingEntryPositionDetailUseCase } from './application/use-cases/get-accounting-entry-position-detail.use-case';
 import { GetAccountingGroupDetailUseCase } from './application/use-cases/get-accounting-group-detail.use-case';
+import { GetAccountingMomentDetailUseCase } from './application/use-cases/get-accounting-moment-detail.use-case';
 import { GetAccountingNatureDetailUseCase } from './application/use-cases/get-accounting-nature-detail.use-case';
+import { GetAccountingSchemeDetailUseCase } from './application/use-cases/get-accounting-scheme-detail.use-case';
 import { GetAccountingStandardDetailUseCase } from './application/use-cases/get-accounting-standard-detail.use-case';
 import { GetBusinessStructureDetailUseCase } from './application/use-cases/get-business-structure-detail.use-case';
 import { GetCostCenterClassDetailUseCase } from './application/use-cases/get-cost-center-class-detail.use-case';
@@ -79,6 +94,7 @@ import { GetCostCenterTypeDetailUseCase } from './application/use-cases/get-cost
 import { GetDocumentSourceDetailUseCase } from './application/use-cases/get-document-source-detail.use-case';
 import { GetDocumentSourceTypeDetailUseCase } from './application/use-cases/get-document-source-type-detail.use-case';
 import { GetFinancialStatementDetailUseCase } from './application/use-cases/get-financial-statement-detail.use-case';
+import { GetKeyOperationDetailUseCase } from './application/use-cases/get-key-operation-detail.use-case';
 import { GetPergamoModuleDetailUseCase } from './application/use-cases/get-pergamo-module-detail.use-case';
 import { GetReferenceDetailUseCase } from './application/use-cases/get-reference-detail.use-case';
 import { GetTypeAccountDetailUseCase } from './application/use-cases/get-type-account-detail.use-case';
@@ -93,10 +109,13 @@ import { GetMonthsUseCase } from './application/use-cases/get-months.use-case';
 import { ListAccountClassesUseCase } from './application/use-cases/list-account-classes.use-case';
 import { ListAccountingAccountsUseCase } from './application/use-cases/list-accounting-accounts.use-case';
 import { ListAccountingDocumentsUseCase } from './application/use-cases/list-accounting-documents.use-case';
+import { ListAccountingEventsUseCase } from './application/use-cases/list-accounting-events.use-case';
 import { ListAccountingEntryHeadersUseCase } from './application/use-cases/list-accounting-entry-headers.use-case';
 import { ListAccountingEntryPositionsUseCase } from './application/use-cases/list-accounting-entry-positions.use-case';
 import { ListAccountingGroupsUseCase } from './application/use-cases/list-accounting-groups.use-case';
+import { ListAccountingMomentsUseCase } from './application/use-cases/list-accounting-moments.use-case';
 import { ListAccountingNaturesUseCase } from './application/use-cases/list-accounting-natures.use-case';
+import { ListAccountingSchemesUseCase } from './application/use-cases/list-accounting-schemes.use-case';
 import { ListBusinessStructuresUseCase } from './application/use-cases/list-business-structures.use-case';
 import { ListCostCenterClassesUseCase } from './application/use-cases/list-cost-center-classes.use-case';
 import { ListCostCentersUseCase } from './application/use-cases/list-cost-centers.use-case';
@@ -105,6 +124,7 @@ import { ListCostCenterTypesUseCase } from './application/use-cases/list-cost-ce
 import { ListDocumentSourcesUseCase } from './application/use-cases/list-document-sources.use-case';
 import { ListDocumentSourceTypesUseCase } from './application/use-cases/list-document-source-types.use-case';
 import { ListFinancialStatementsUseCase } from './application/use-cases/list-financial-statements.use-case';
+import { ListKeyOperationsUseCase } from './application/use-cases/list-key-operations.use-case';
 import { ListPergamoModulesUseCase } from './application/use-cases/list-pergamo-modules.use-case';
 import { ListReferencesUseCase } from './application/use-cases/list-references.use-case';
 import { GetTypePlanDetailUseCase } from './application/use-cases/get-type-plan-detail.use-case';
@@ -116,10 +136,13 @@ import { ListTypePlansUseCase } from './application/use-cases/list-type-plans.us
 import { RestoreAccountClassUseCase } from './application/use-cases/restore-account-class.use-case';
 import { RestoreAccountingAccountUseCase } from './application/use-cases/restore-accounting-account.use-case';
 import { RestoreAccountingDocumentUseCase } from './application/use-cases/restore-accounting-document.use-case';
+import { RestoreAccountingEventUseCase } from './application/use-cases/restore-accounting-event.use-case';
 import { RestoreAccountingEntryHeaderUseCase } from './application/use-cases/restore-accounting-entry-header.use-case';
 import { RestoreAccountingEntryPositionUseCase } from './application/use-cases/restore-accounting-entry-position.use-case';
 import { RestoreAccountingGroupUseCase } from './application/use-cases/restore-accounting-group.use-case';
+import { RestoreAccountingMomentUseCase } from './application/use-cases/restore-accounting-moment.use-case';
 import { RestoreAccountingNatureUseCase } from './application/use-cases/restore-accounting-nature.use-case';
+import { RestoreAccountingSchemeUseCase } from './application/use-cases/restore-accounting-scheme.use-case';
 import { RestoreAccountingStandardUseCase } from './application/use-cases/restore-accounting-standard.use-case';
 import { RestoreBusinessStructureUseCase } from './application/use-cases/restore-business-structure.use-case';
 import { RestoreCostCenterClassUseCase } from './application/use-cases/restore-cost-center-class.use-case';
@@ -129,6 +152,7 @@ import { RestoreCostCenterTypeUseCase } from './application/use-cases/restore-co
 import { RestoreDocumentSourceUseCase } from './application/use-cases/restore-document-source.use-case';
 import { RestoreDocumentSourceTypeUseCase } from './application/use-cases/restore-document-source-type.use-case';
 import { RestoreFinancialStatementUseCase } from './application/use-cases/restore-financial-statement.use-case';
+import { RestoreKeyOperationUseCase } from './application/use-cases/restore-key-operation.use-case';
 import { RestorePergamoModuleUseCase } from './application/use-cases/restore-pergamo-module.use-case';
 import { RestoreReferenceUseCase } from './application/use-cases/restore-reference.use-case';
 import { RestoreChartAccountUseCase } from './application/use-cases/restore-chart-account.use-case';
@@ -136,10 +160,13 @@ import { RestoreTypeAccountUseCase } from './application/use-cases/restore-type-
 import { UpdateAccountClassUseCase } from './application/use-cases/update-account-class.use-case';
 import { UpdateAccountingAccountUseCase } from './application/use-cases/update-accounting-account.use-case';
 import { UpdateAccountingDocumentUseCase } from './application/use-cases/update-accounting-document.use-case';
+import { UpdateAccountingEventUseCase } from './application/use-cases/update-accounting-event.use-case';
 import { UpdateAccountingEntryHeaderUseCase } from './application/use-cases/update-accounting-entry-header.use-case';
 import { UpdateAccountingEntryPositionUseCase } from './application/use-cases/update-accounting-entry-position.use-case';
 import { UpdateAccountingGroupUseCase } from './application/use-cases/update-accounting-group.use-case';
+import { UpdateAccountingMomentUseCase } from './application/use-cases/update-accounting-moment.use-case';
 import { UpdateAccountingNatureUseCase } from './application/use-cases/update-accounting-nature.use-case';
+import { UpdateAccountingSchemeUseCase } from './application/use-cases/update-accounting-scheme.use-case';
 import { UpdateBusinessStructureUseCase } from './application/use-cases/update-business-structure.use-case';
 import { UpdateCostCenterClassUseCase } from './application/use-cases/update-cost-center-class.use-case';
 import { UpdateCostCenterUseCase } from './application/use-cases/update-cost-center.use-case';
@@ -148,6 +175,7 @@ import { UpdateCostCenterTypeUseCase } from './application/use-cases/update-cost
 import { UpdateDocumentSourceUseCase } from './application/use-cases/update-document-source.use-case';
 import { UpdateDocumentSourceTypeUseCase } from './application/use-cases/update-document-source-type.use-case';
 import { UpdateFinancialStatementUseCase } from './application/use-cases/update-financial-statement.use-case';
+import { UpdateKeyOperationUseCase } from './application/use-cases/update-key-operation.use-case';
 import { UpdatePergamoModuleUseCase } from './application/use-cases/update-pergamo-module.use-case';
 import { UpdateReferenceUseCase } from './application/use-cases/update-reference.use-case';
 import { RestoreTypePlanUseCase } from './application/use-cases/restore-type-plan.use-case';
@@ -161,10 +189,13 @@ import { DeleteTypePlanUseCase } from './application/use-cases/delete-type-plan.
 import { HttpAccountClassRepository } from './infrastructure/adapters/http-account-class.repository';
 import { HttpAccountingAccountRepository } from './infrastructure/adapters/http-accounting-account.repository';
 import { HttpAccountingDocumentRepository } from './infrastructure/adapters/http-accounting-document.repository';
+import { HttpAccountingEventRepository } from './infrastructure/adapters/http-accounting-event.repository';
 import { HttpAccountingEntryHeaderRepository } from './infrastructure/adapters/http-accounting-entry-header.repository';
 import { HttpAccountingEntryPositionRepository } from './infrastructure/adapters/http-accounting-entry-position.repository';
 import { HttpAccountingGroupRepository } from './infrastructure/adapters/http-accounting-group.repository';
+import { HttpAccountingMomentRepository } from './infrastructure/adapters/http-accounting-moment.repository';
 import { HttpAccountingNatureRepository } from './infrastructure/adapters/http-accounting-nature.repository';
+import { HttpAccountingSchemeRepository } from './infrastructure/adapters/http-accounting-scheme.repository';
 import { HttpAccountingStandardRepository } from './infrastructure/adapters/http-accounting-standard.repository';
 import { HttpAccountingSelectOptionsRepository } from './infrastructure/adapters/http-accounting-select-options.repository';
 import { HttpBusinessStructureRepository } from './infrastructure/adapters/http-business-structure.repository';
@@ -177,6 +208,7 @@ import { HttpDocumentSourceRepository } from './infrastructure/adapters/http-doc
 import { HttpDocumentSourceTypeRepository } from './infrastructure/adapters/http-document-source-type.repository';
 import { HttpExerciseVariationRepository } from './infrastructure/adapters/http-exercise-variation.repository';
 import { HttpFinancialStatementRepository } from './infrastructure/adapters/http-financial-statement.repository';
+import { HttpKeyOperationRepository } from './infrastructure/adapters/http-key-operation.repository';
 import { HttpPergamoModuleRepository } from './infrastructure/adapters/http-pergamo-module.repository';
 import { HttpReferenceRepository } from './infrastructure/adapters/http-reference.repository';
 import { HttpTypeAccountRepository } from './infrastructure/adapters/http-type-account.repository';
@@ -905,6 +937,141 @@ export const CONTABILIDAD_ROUTES: Routes = [
       import(
         './presentation/pages/posicion-asiento-contable-page/posicion-asiento-contable-page.component'
       ).then((m) => m.PosicionAsientoContablePageComponent)
+  },
+  {
+    path: 'submenu-23',
+    pathMatch: 'full',
+    redirectTo: 'clave-operacion'
+  },
+  {
+    path: 'clave-operacion',
+    data: {
+      animation: 'contabilidad-clave-operacion',
+      submenuTitle: 'Clave Operacion',
+      submenuDescription:
+        'Este contenedor corresponde al submodulo Clave Operacion de Contabilidad.'
+    },
+    providers: [
+      GetAccountingSelectOptionsUseCase,
+      ListKeyOperationsUseCase,
+      GetKeyOperationDetailUseCase,
+      CreateKeyOperationUseCase,
+      UpdateKeyOperationUseCase,
+      DeleteKeyOperationUseCase,
+      RestoreKeyOperationUseCase,
+      {
+        provide: ACCOUNTING_SELECT_OPTIONS_REPOSITORY,
+        useClass: HttpAccountingSelectOptionsRepository
+      },
+      {
+        provide: KEY_OPERATION_REPOSITORY,
+        useClass: HttpKeyOperationRepository
+      }
+    ],
+    loadComponent: () =>
+      import('./presentation/pages/clave-operacion-page/clave-operacion-page.component').then(
+        (m) => m.ClaveOperacionPageComponent
+      )
+  },
+  {
+    path: 'submenu-24',
+    pathMatch: 'full',
+    redirectTo: 'momento-contable'
+  },
+  {
+    path: 'momento-contable',
+    data: {
+      animation: 'contabilidad-momento-contable',
+      submenuTitle: 'Momento Contable',
+      submenuDescription:
+        'Este contenedor corresponde al submodulo Momento Contable de Contabilidad.'
+    },
+    providers: [
+      ListAccountingMomentsUseCase,
+      GetAccountingMomentDetailUseCase,
+      CreateAccountingMomentUseCase,
+      UpdateAccountingMomentUseCase,
+      DeleteAccountingMomentUseCase,
+      RestoreAccountingMomentUseCase,
+      {
+        provide: ACCOUNTING_MOMENT_REPOSITORY,
+        useClass: HttpAccountingMomentRepository
+      }
+    ],
+    loadComponent: () =>
+      import('./presentation/pages/momento-contable-page/momento-contable-page.component').then(
+        (m) => m.MomentoContablePageComponent
+      )
+  },
+  {
+    path: 'submenu-25',
+    pathMatch: 'full',
+    redirectTo: 'evento-contable'
+  },
+  {
+    path: 'evento-contable',
+    data: {
+      animation: 'contabilidad-evento-contable',
+      submenuTitle: 'Evento Contable',
+      submenuDescription:
+        'Este contenedor corresponde al submodulo Evento Contable de Contabilidad.'
+    },
+    providers: [
+      GetAccountingSelectOptionsUseCase,
+      ListAccountingEventsUseCase,
+      GetAccountingEventDetailUseCase,
+      CreateAccountingEventUseCase,
+      UpdateAccountingEventUseCase,
+      DeleteAccountingEventUseCase,
+      RestoreAccountingEventUseCase,
+      {
+        provide: ACCOUNTING_SELECT_OPTIONS_REPOSITORY,
+        useClass: HttpAccountingSelectOptionsRepository
+      },
+      {
+        provide: ACCOUNTING_EVENT_REPOSITORY,
+        useClass: HttpAccountingEventRepository
+      }
+    ],
+    loadComponent: () =>
+      import('./presentation/pages/evento-contable-page/evento-contable-page.component').then(
+        (m) => m.EventoContablePageComponent
+      )
+  },
+  {
+    path: 'submenu-26',
+    pathMatch: 'full',
+    redirectTo: 'esquema-contable'
+  },
+  {
+    path: 'esquema-contable',
+    data: {
+      animation: 'contabilidad-esquema-contable',
+      submenuTitle: 'Esquema Contable',
+      submenuDescription:
+        'Este contenedor corresponde al submodulo Esquema Contable de Contabilidad.'
+    },
+    providers: [
+      GetAccountingSelectOptionsUseCase,
+      ListAccountingSchemesUseCase,
+      GetAccountingSchemeDetailUseCase,
+      CreateAccountingSchemeUseCase,
+      UpdateAccountingSchemeUseCase,
+      DeleteAccountingSchemeUseCase,
+      RestoreAccountingSchemeUseCase,
+      {
+        provide: ACCOUNTING_SELECT_OPTIONS_REPOSITORY,
+        useClass: HttpAccountingSelectOptionsRepository
+      },
+      {
+        provide: ACCOUNTING_SCHEME_REPOSITORY,
+        useClass: HttpAccountingSchemeRepository
+      }
+    ],
+    loadComponent: () =>
+      import('./presentation/pages/esquema-contable-page/esquema-contable-page.component').then(
+        (m) => m.EsquemaContablePageComponent
+      )
   },
   {
     path: 'submenu-legacy-2',

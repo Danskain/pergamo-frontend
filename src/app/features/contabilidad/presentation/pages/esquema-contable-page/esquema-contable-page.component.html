@@ -1,0 +1,328 @@
+<section class="esquema-contable-page">
+  <app-crud-page-hero
+    eyebrow="Contabilidad / Esquema Contable"
+    title="Esquema Contable"
+    description="Administra los esquemas contables, sus relaciones operativas y la configuracion necesaria para la contabilizacion automatica."
+  >
+    <div crudHeroActions class="hero-actions">
+      <button nbButton status="primary" (click)="startCreate()">
+        <nb-icon icon="plus-outline"></nb-icon>
+        Nuevo esquema
+      </button>
+      <button nbButton ghost status="basic" (click)="refreshData()">
+        <nb-icon icon="refresh-outline"></nb-icon>
+        Recargar
+      </button>
+    </div>
+  </app-crud-page-hero>
+
+  @if (showForm()) {
+    <section class="workspace-grid workspace-grid--form">
+      <app-crud-section-card
+        kicker="Formulario"
+        [title]="formTitle()"
+        [loading]="submitting() || selectedAccountingSchemeResource.isLoading()"
+      >
+        <button crudSectionActions nbButton ghost status="basic" type="button" (click)="closeForm()">
+          Volver a la tabla
+        </button>
+
+        <form class="crud-form" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-grid">
+            <label class="field field--full">
+              <span class="field-label">Estructura empresarial</span>
+              <nb-select fullWidth formControlName="businessStructureId" placeholder="Selecciona una estructura" scrollStrategy="reposition" [disabled]="selectOptionsResource.isLoading()">
+                @for (option of businessStructureOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Plan de cuentas</span>
+              <nb-select fullWidth formControlName="chartAccountId" placeholder="Selecciona un plan" scrollStrategy="reposition" [disabled]="selectOptionsResource.isLoading()">
+                @for (option of chartAccountOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Clase de valoracion</span>
+              <input nbInput fullWidth formControlName="assessmentClass" placeholder="Ej. Inventario general" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Tipo de movimiento</span>
+              <input
+                nbInput
+                fullWidth
+                type="number"
+                min="1"
+                step="1"
+                formControlName="typeMovementId"
+                placeholder="Ej. 1"
+              />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Evento contable</span>
+              <nb-select fullWidth formControlName="accountingEventId" placeholder="Selecciona un evento" scrollStrategy="reposition" [disabled]="selectOptionsResource.isLoading()">
+                @for (option of accountingEventOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Clave operacion</span>
+              <nb-select fullWidth formControlName="keyOperationId" placeholder="Selecciona una clave" scrollStrategy="reposition" [disabled]="selectOptionsResource.isLoading()">
+                @for (option of keyOperationOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Cuenta contable</span>
+              <nb-select fullWidth formControlName="accountingAccountId" placeholder="Selecciona una cuenta" scrollStrategy="reposition" [disabled]="selectOptionsResource.isLoading()">
+                @for (option of accountingAccountOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Naturaleza contable</span>
+              <nb-select fullWidth formControlName="accountingNatureId" placeholder="Selecciona una naturaleza" scrollStrategy="reposition" [disabled]="selectOptionsResource.isLoading()">
+                @for (option of accountingNatureOptions(); track option.value) {
+                  <nb-option [value]="option.value">{{ option.label }}</nb-option>
+                }
+              </nb-select>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-label">Requiere coce</p>
+              <p class="toggle-copy">
+                Activa esta opcion si el esquema contable exige centro de costo en la contabilizacion.
+              </p>
+            </div>
+            <nb-toggle formControlName="requireCoce"></nb-toggle>
+          </div>
+
+          <div class="form-actions">
+            <button nbButton status="primary" type="submit" [disabled]="submitting()">
+              {{ submitLabel() }}
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="closeForm()">
+              Cancelar
+            </button>
+            <button nbButton ghost status="basic" type="button" (click)="startCreate()">
+              Limpiar formulario
+            </button>
+          </div>
+        </form>
+      </app-crud-section-card>
+    </section>
+  } @else {
+    <section class="workspace-grid workspace-grid--table">
+      <app-crud-section-card
+        kicker="Registros"
+        title="Tabla"
+        summary="Consulta, busca y administra todos los registros de esquema contable."
+        [loading]="accountingSchemesResource.isLoading()"
+      >
+        <app-crud-collection-shell
+          [hasItems]="accountingSchemes().length > 0"
+          [pageSummary]="pageSummary()"
+          [currentPage]="pagination().currentPage"
+          [lastPage]="pagination().lastPage"
+          [canGoPrevious]="canGoPrevious()"
+          [canGoNext]="canGoNext()"
+          [perPage]="perPage()"
+          [perPageOptions]="perPageOptions()"
+          (previousPage)="goToPreviousPage()"
+          (nextPage)="goToNextPage()"
+          (perPageChange)="changePerPage($event)"
+        >
+          <label crudSearch class="search-field" for="accounting-scheme-search">
+            <span>Buscar</span>
+            <input nbInput fullWidth id="accounting-scheme-search" class="search-input" placeholder="Buscar" [nbFilterInput]="treeGridDataSource()" />
+          </label>
+
+          <div crudDesktopContent class="table-shell">
+            <table class="crud-tree-grid" [nbTreeGrid]="treeGridDataSource()" [nbSort]="treeGridDataSource()" (sort)="changeSort($event)">
+              <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="treeGridAllColumns"></tr>
+              <tr nbTreeGridRow *nbTreeGridRowDef="let row; columns: treeGridAllColumns"></tr>
+
+              <ng-container [nbTreeGridColumnDef]="treeGridCustomColumn">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection(treeGridCustomColumn)" *nbTreeGridHeaderCellDef>
+                  Clase
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <div class="identity-cell">
+                    <div class="cell-stack">
+                      <strong>{{ row.data.assessmentClass }}</strong>
+                      <span>{{ row.data.accountingEventName }}</span>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="id">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('id')" *nbTreeGridHeaderCellDef>Id</th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="numeric-cell">{{ row.data.id }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="businessStructureName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('businessStructureName')" *nbTreeGridHeaderCellDef>
+                  Estructura
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.businessStructureName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="chartAccountName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('chartAccountName')" *nbTreeGridHeaderCellDef>
+                  Plan
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.chartAccountName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="typeMovementName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('typeMovementName')" *nbTreeGridHeaderCellDef>
+                  Movimiento
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.typeMovementName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="accountingEventName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('accountingEventName')" *nbTreeGridHeaderCellDef>
+                  Evento
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.accountingEventName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="keyOperationName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('keyOperationName')" *nbTreeGridHeaderCellDef>
+                  Clave
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.keyOperationName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="accountingAccountName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('accountingAccountName')" *nbTreeGridHeaderCellDef>
+                  Cuenta
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.accountingAccountName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="accountingNatureName">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('accountingNatureName')" *nbTreeGridHeaderCellDef>
+                  Naturaleza
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data.accountingNatureName }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="requireCoce">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('requireCoce')" *nbTreeGridHeaderCellDef>
+                  Coce
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row">
+                  <span class="status-pill" [class.status-pill--positive]="row.data.requireCoce">
+                    {{ row.data.requireCoce ? 'Si' : 'No' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="createdAt">
+                <th nbTreeGridHeaderCell [nbSortHeader]="getSortDirection('createdAt')" *nbTreeGridHeaderCellDef>
+                  Creado
+                </th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="date-cell">{{ row.data.createdAt | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
+              </ng-container>
+
+              <ng-container nbTreeGridColumnDef="actions">
+                <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef class="actions-column">Acciones</th>
+                <td nbTreeGridCell *nbTreeGridCellDef="let row" class="actions-column">
+                  <div class="row-actions">
+                    <button nbButton ghost status="info" size="small" class="action-button" type="button" title="Editar" aria-label="Editar registro" (click)="editAccountingScheme(row.data.id)">
+                      <nb-icon icon="edit-2-outline"></nb-icon>
+                    </button>
+                    @if (row.data.deletedAt) {
+                      <button nbButton ghost status="success" size="small" class="action-button" type="button" title="Restaurar" aria-label="Restaurar registro" (click)="restoreAccountingScheme(row.data.id)" [disabled]="restoringId() === row.data.id">
+                        <nb-icon icon="undo-outline"></nb-icon>
+                      </button>
+                    } @else {
+                      <button nbButton ghost status="danger" size="small" class="action-button" type="button" title="Eliminar" aria-label="Eliminar registro" (click)="deleteAccountingScheme(row.data.id)" [disabled]="deletingId() === row.data.id">
+                        <nb-icon icon="trash-2-outline"></nb-icon>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+            </table>
+          </div>
+
+          <div crudMobileContent class="mobile-list">
+            @for (accountingScheme of accountingSchemes(); track accountingScheme.id) {
+              <article class="mobile-card">
+                <div class="mobile-card__header">
+                  <div class="mobile-card__identity">
+                    <strong>{{ accountingScheme.assessmentClass }}</strong>
+                    <span>{{ accountingScheme.accountingEvent?.label ?? accountingScheme.accountingEvent?.name ?? 'Id ' + accountingScheme.accountingEventId }}</span>
+                  </div>
+                </div>
+                <div class="mobile-card__grid">
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Id</span>
+                    <span class="mobile-detail__value">{{ accountingScheme.id }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Plan</span>
+                    <span class="mobile-detail__value">{{ accountingScheme.chartAccount?.label ?? accountingScheme.chartAccount?.name ?? 'Id ' + accountingScheme.chartAccountId }}</span>
+                  </div>
+                  <div class="mobile-detail mobile-detail--full">
+                    <span class="mobile-detail__label">Cuenta</span>
+                    <span class="mobile-detail__value">{{ accountingScheme.accountingAccount?.label ?? accountingScheme.accountingAccount?.name ?? 'Id ' + accountingScheme.accountingAccountId }}</span>
+                  </div>
+                  <div class="mobile-detail">
+                    <span class="mobile-detail__label">Coce</span>
+                    <span class="mobile-detail__value">{{ accountingScheme.requireCoce ? 'Si' : 'No' }}</span>
+                  </div>
+                </div>
+                <div class="mobile-card__actions">
+                  <button nbButton ghost status="info" size="small" class="action-button" type="button" (click)="editAccountingScheme(accountingScheme.id)">
+                    <nb-icon icon="edit-2-outline"></nb-icon>
+                    Editar
+                  </button>
+                  @if (accountingScheme.deletedAt) {
+                    <button nbButton ghost status="success" size="small" class="action-button" type="button" (click)="restoreAccountingScheme(accountingScheme.id)" [disabled]="restoringId() === accountingScheme.id">
+                      <nb-icon icon="undo-outline"></nb-icon>
+                      Restaurar
+                    </button>
+                  } @else {
+                    <button nbButton ghost status="danger" size="small" class="action-button" type="button" (click)="deleteAccountingScheme(accountingScheme.id)" [disabled]="deletingId() === accountingScheme.id">
+                      <nb-icon icon="trash-2-outline"></nb-icon>
+                      Eliminar
+                    </button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+
+          <div crudEmptyState class="empty-state">
+            <nb-icon icon="layers-outline"></nb-icon>
+            <h3>Sin registros</h3>
+            <p>
+              Todavia no hay esquemas contables para esta consulta. Usa el boton `Nuevo esquema`
+              para crear el primero.
+            </p>
+          </div>
+        </app-crud-collection-shell>
+      </app-crud-section-card>
+    </section>
+  }
+</section>
