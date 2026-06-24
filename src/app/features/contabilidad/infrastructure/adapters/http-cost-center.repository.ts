@@ -1,4 +1,5 @@
 import { HttpClient } from '@angular/common/http';
+import { resolveApiBaseUrl } from '../api-base-url';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
@@ -78,7 +79,7 @@ interface CostCenterResponse {
 @Injectable()
 export class HttpCostCenterRepository implements CostCenterRepository {
   private readonly http = inject(HttpClient);
-  private readonly apiBaseUrl = 'http://localhost:8000/api/v1';
+  private readonly apiBaseUrl = resolveApiBaseUrl();
 
   list(page: number, perPage: number): Observable<CostCenterPage> {
     return this.http

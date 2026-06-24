@@ -1,4 +1,5 @@
 import { HttpClient } from '@angular/common/http';
+import { resolveApiBaseUrl } from '../api-base-url';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
@@ -70,7 +71,7 @@ interface ExerciseVariationResponse {
 @Injectable()
 export class HttpExerciseVariationRepository implements ExerciseVariationRepository {
   private readonly http = inject(HttpClient);
-  private readonly apiBaseUrl = 'http://localhost:8000/api/v1';
+  private readonly apiBaseUrl = resolveApiBaseUrl();
 
   getMonths(): Observable<Month[]> {
     return this.http
