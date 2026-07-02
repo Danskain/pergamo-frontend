@@ -1,0 +1,1 @@
+import{b as s}from"./chunk-ABZV7GWW.js";import{c}from"./chunk-S33I3ZOB.js";import{aa as r,pc as i,ra as n}from"./chunk-PBQQYDLL.js";function S(u,a){let l=r(s),t=n(0),o=c({params:()=>({refreshTick:t()}),stream:()=>l.execute(u,a),defaultValue:{}});return{resource:o,optionsFor(e){return i(()=>o.value()[e]??[])},refresh(){t.update(e=>e+1)}}}export{S as a};

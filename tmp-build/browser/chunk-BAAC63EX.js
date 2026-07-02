@@ -1,1 +1,0 @@
-import{X as n,_ as i,aa as r}from"./chunk-X3H5VOK6.js";var c=new i("ACCOUNTING_SELECT_OPTIONS_REPOSITORY");var s=class t{repository=r(c);execute(o,e){return this.repository.getMany(o,e)}static \u0275fac=function(e){return new(e||t)};static \u0275prov=n({token:t,factory:t.\u0275fac})};export{c as a,s as b};

@@ -1,1 +1,0 @@
-import{X as o,_ as t,aa as e}from"./chunk-X3H5VOK6.js";var n=new t("ACCOUNTING_SUMMARY_REPOSITORY");var i=class r{repository=e(n);execute(){return this.repository.getSummary()}static \u0275fac=function(m){return new(m||r)};static \u0275prov=o({token:r,factory:r.\u0275fac})};export{n as a,i as b};

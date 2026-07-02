@@ -10,7 +10,7 @@ To start a local development server, run:
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Once the server is running, open your browser and navigate to `http://localhost:4300/`. The application will automatically reload whenever you modify any of the source files.
 
 ## Code scaffolding
 
@@ -35,6 +35,37 @@ ng build
 ```
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+
+## Deployment Variables
+
+For Docker and Railway deployments, the application reads runtime variables from `env.js`.
+
+Required variables:
+
+```bash
+API_BASE_URL=https://your-api.example.com/api/v1
+LEGACY_APP_ORIGIN=https://your-legacy-app.example.com/auth
+LEGACY_LOGOUT_URL=https://your-legacy-app.example.com/auth
+```
+
+QA example:
+
+```bash
+LEGACY_APP_ORIGIN=https://capacitacion.hlips.com.co/auth
+LEGACY_LOGOUT_URL=https://capacitacion.hlips.com.co/auth
+```
+
+Production example:
+
+```bash
+LEGACY_APP_ORIGIN=https://pergamo.hlips.com.co/auth
+LEGACY_LOGOUT_URL=https://pergamo.hlips.com.co/auth
+```
+
+Notes:
+
+- `LEGACY_APP_ORIGIN` is normalized internally to the origin required by `postMessage`.
+- `LEGACY_LOGOUT_URL` is used directly to redirect the user back to the legacy Pergamo login/logout page.
 
 ## Running unit tests
 

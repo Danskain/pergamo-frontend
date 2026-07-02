@@ -12,6 +12,8 @@ FROM nginx:1.29-alpine
 
 ENV PORT=8080
 ENV API_BASE_URL=http://localhost:8000/api/v1
+ENV LEGACY_APP_ORIGIN=http://localhost:4200
+ENV LEGACY_LOGOUT_URL=http://localhost:4200/auth/logout
 
 COPY docker/nginx/default.conf.template /templates/default.conf.template
 COPY docker/env.js.template /templates/env.js.template
