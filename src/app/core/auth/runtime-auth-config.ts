@@ -1,3 +1,5 @@
+import { environment } from '../../../environments/environment';
+
 type RuntimeEnvironment = {
   LEGACY_APP_ORIGIN?: string;
   LEGACY_APP_ORIGINS?: string | string[];
@@ -7,8 +9,8 @@ type RuntimeEnvironment = {
   legacyLogoutUrl?: string;
 };
 
-const DEFAULT_LEGACY_APP_ORIGIN = 'http://localhost:4200';
-const DEFAULT_LEGACY_LOGOUT_URL = 'http://localhost:4200/auth/logout';
+const DEFAULT_LEGACY_APP_ORIGIN = environment.legacyAppOrigin;
+const DEFAULT_LEGACY_LOGOUT_URL = environment.legacyLogoutUrl;
 
 function normalizeOrigin(value: string): string {
   try {

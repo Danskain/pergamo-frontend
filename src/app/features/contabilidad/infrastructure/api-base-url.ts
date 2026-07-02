@@ -1,9 +1,11 @@
+import { environment } from '../../../../environments/environment';
+
 type RuntimeEnvironment = {
   API_BASE_URL?: string;
   apiBaseUrl?: string;
 };
 
-const DEFAULT_API_BASE_URL = 'http://localhost:8000/api/v1';
+const DEFAULT_API_BASE_URL = environment.apiBaseUrl;
 
 function normalizeApiBaseUrl(url: string): string {
   return url.replace(/\/+$/, '');

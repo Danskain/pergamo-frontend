@@ -40,6 +40,12 @@ This will compile your project and store the build artifacts in the `dist/` dire
 
 For Docker and Railway deployments, the application reads runtime variables from `env.js`.
 
+Environment files available:
+
+- `src/environments/environment.ts`: local defaults
+- `src/environments/environment.qa.ts`: QA defaults
+- `src/environments/environment.production.ts`: production defaults
+
 Required variables:
 
 ```bash
