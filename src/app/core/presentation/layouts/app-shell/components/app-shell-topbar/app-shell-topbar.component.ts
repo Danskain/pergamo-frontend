@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import {
   NbBadgeModule,
   NbButtonModule,
@@ -8,6 +8,8 @@ import {
   NbToggleModule,
   NbUserModule
 } from '@nebular/theme';
+
+import { AuthSessionService } from '../../../../../auth/auth-session.service';
 
 type AppTheme = 'default' | 'dark';
 
@@ -26,13 +28,14 @@ type AppTheme = 'default' | 'dark';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppShellTopbarComponent {
+  private readonly authSession = inject(AuthSessionService);
   private readonly themeService = inject(NbThemeService);
 
   readonly appName = input.required<string>();
   readonly menuToggle = output<void>();
   protected readonly notificationCount = 3;
-  protected readonly userName = 'Usuario Demo';
-  protected readonly userTitle = 'Perfil activo';
+  protected readonly userName = computed(() => this.authSession.userProfile().fullName);
+  protected readonly userTitle = computed(() => this.authSession.userProfile().role);
   protected readonly isDarkMode = signal(this.getStoredTheme() === 'dark');
 
   constructor() {

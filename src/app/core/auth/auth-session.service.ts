@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 
 export interface PergamoAuthMessage {
   type: 'PERGAMO_AUTH';
@@ -14,6 +14,15 @@ interface StoredAuthSession {
   receivedAt: string;
 }
 
+interface JwtPayload {
+  exp?: number;
+  user_id?: number;
+  username?: string;
+  nombre_completo?: string;
+  role?: string;
+  company_id?: number;
+}
+
 const AUTH_STORAGE_KEY = 'pergamo.auth.session';
 
 @Injectable({ providedIn: 'root' })
@@ -23,6 +32,15 @@ export class AuthSessionService {
 
   readonly session = this.sessionState.asReadonly();
   readonly awaitingExternalAuth = this.awaitingExternalAuthState.asReadonly();
+  readonly userProfile = computed(() => {
+    const session = this.getValidSession();
+    const payload = session ? this.decodeJwtPayload(session.accessToken) : null;
+
+    return {
+      fullName: payload?.nombre_completo?.trim() || 'Usuario',
+      role: payload?.role?.trim() || 'Perfil activo'
+    };
+  });
 
   saveFromMessage(message: PergamoAuthMessage): void {
     const normalizedSession: StoredAuthSession = {
@@ -144,5 +162,28 @@ export class AuthSessionService {
     }
 
     return Date.now() >= receivedAt + session.expiresIn * 1000;
+  }
+
+  private decodeJwtPayload(token: string): JwtPayload | null {
+    const tokenParts = token.split('.');
+
+    if (tokenParts.length < 2) {
+      return null;
+    }
+
+    try {
+      const base64 = tokenParts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const normalizedBase64 = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
+      const decodedValue = atob(normalizedBase64);
+      const utf8Value = decodeURIComponent(
+        Array.from(decodedValue)
+          .map((character) => `%${character.charCodeAt(0).toString(16).padStart(2, '0')}`)
+          .join('')
+      );
+
+      return JSON.parse(utf8Value) as JwtPayload;
+    } catch {
+      return null;
+    }
   }
 }
