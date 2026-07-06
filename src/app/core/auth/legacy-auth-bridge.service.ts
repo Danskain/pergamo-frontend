@@ -12,30 +12,46 @@ export class LegacyAuthBridgeService {
   private readonly handshakeTimeoutMs = 1500;
 
   private initialized = false;
+  private initializationPromise: Promise<void> | null = null;
+  private finishInitialization: (() => void) | null = null;
 
-  initialize(): void {
-    if (this.initialized || typeof window === 'undefined') {
-      return;
+  initialize(): Promise<void> {
+    if (typeof window === 'undefined') {
+      return Promise.resolve();
     }
 
-    window.addEventListener('message', this.handleMessage);
-    this.initialized = true;
-
-    if (this.authSession.hasValidSession()) {
-      return;
+    if (this.initializationPromise) {
+      return this.initializationPromise;
     }
 
+    if (!this.initialized) {
+      window.addEventListener('message', this.handleMessage);
+      this.initialized = true;
+    }
+
+    this.authSession.clearSession();
     this.authSession.beginExternalAuthHandshake();
 
-    window.setTimeout(() => {
-      if (this.authSession.hasValidSession()) {
+    this.initializationPromise = new Promise<void>((resolve) => {
+      this.finishInitialization = () => {
         this.authSession.finishExternalAuthHandshake();
-        return;
-      }
+        this.finishInitialization = null;
+        resolve();
+      };
 
-      this.authSession.clearSession();
-      this.legacyLogoutRedirect.redirect();
-    }, this.handshakeTimeoutMs);
+      window.setTimeout(() => {
+        if (this.authSession.hasValidSession()) {
+          this.finishInitialization?.();
+          return;
+        }
+
+        this.authSession.clearSession();
+        this.finishInitialization?.();
+        this.legacyLogoutRedirect.redirect();
+      }, this.handshakeTimeoutMs);
+    });
+
+    return this.initializationPromise;
   }
 
   private readonly handleMessage = (event: MessageEvent<unknown>): void => {
@@ -48,6 +64,7 @@ export class LegacyAuthBridgeService {
     }
 
     this.authSession.saveFromMessage(event.data);
+    this.finishInitialization?.();
   };
 
   private isPergamoAuthMessage(value: unknown): value is PergamoAuthMessage {

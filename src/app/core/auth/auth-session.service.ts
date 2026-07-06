@@ -5,6 +5,19 @@ export interface PergamoAuthMessage {
   access_token: string;
   token_type?: string;
   expires_in?: number | null;
+  user_id?: number;
+  username?: string;
+  nombre_completo?: string;
+  role?: string;
+  company_id?: number;
+}
+
+interface UserProfile {
+  userId: number | null;
+  username: string | null;
+  fullName: string;
+  role: string;
+  companyId: number | null;
 }
 
 interface StoredAuthSession {
@@ -12,6 +25,7 @@ interface StoredAuthSession {
   tokenType: string;
   expiresIn: number | null;
   receivedAt: string;
+  userProfile: UserProfile | null;
 }
 
 interface JwtPayload {
@@ -34,20 +48,18 @@ export class AuthSessionService {
   readonly awaitingExternalAuth = this.awaitingExternalAuthState.asReadonly();
   readonly userProfile = computed(() => {
     const session = this.getValidSession();
-    const payload = session ? this.decodeJwtPayload(session.accessToken) : null;
 
-    return {
-      fullName: payload?.nombre_completo?.trim() || 'Usuario',
-      role: payload?.role?.trim() || 'Perfil activo'
-    };
+    return session?.userProfile ?? this.getAnonymousUserProfile();
   });
 
   saveFromMessage(message: PergamoAuthMessage): void {
+    const decodedPayload = this.decodeJwtPayload(message.access_token);
     const normalizedSession: StoredAuthSession = {
       accessToken: message.access_token,
       tokenType: message.token_type?.trim() || 'Bearer',
       expiresIn: typeof message.expires_in === 'number' ? message.expires_in : null,
-      receivedAt: new Date().toISOString()
+      receivedAt: new Date().toISOString(),
+      userProfile: this.resolveUserProfile(message, decodedPayload)
     };
 
     this.sessionState.set(normalizedSession);
@@ -134,7 +146,8 @@ export class AuthSessionService {
         tokenType: parsedValue.tokenType?.trim() || 'Bearer',
         expiresIn:
           typeof parsedValue.expiresIn === 'number' ? parsedValue.expiresIn : null,
-        receivedAt: parsedValue.receivedAt ?? new Date().toISOString()
+        receivedAt: parsedValue.receivedAt ?? new Date().toISOString(),
+        userProfile: this.restoreUserProfile(parsedValue)
       };
     } catch {
       localStorage.removeItem(AUTH_STORAGE_KEY);
@@ -165,7 +178,8 @@ export class AuthSessionService {
   }
 
   private decodeJwtPayload(token: string): JwtPayload | null {
-    const tokenParts = token.split('.');
+    const normalizedToken = token.replace(/^Bearer\s+/i, '').trim();
+    const tokenParts = normalizedToken.split('.');
 
     if (tokenParts.length < 2) {
       return null;
@@ -185,5 +199,67 @@ export class AuthSessionService {
     } catch {
       return null;
     }
+  }
+
+  private resolveUserProfile(
+    message: Partial<PergamoAuthMessage>,
+    payload: JwtPayload | null
+  ): UserProfile {
+    return {
+      userId: this.resolveNumber(message.user_id, payload?.user_id),
+      username: this.resolveString(message.username, payload?.username),
+      fullName:
+        this.resolveString(message.nombre_completo, payload?.nombre_completo) ?? 'Usuario',
+      role: this.resolveString(message.role, payload?.role) ?? 'Perfil activo',
+      companyId: this.resolveNumber(message.company_id, payload?.company_id)
+    };
+  }
+
+  private restoreUserProfile(session: Partial<StoredAuthSession>): UserProfile {
+    const storedUserProfile = session.userProfile;
+
+    if (storedUserProfile) {
+      return {
+        userId: this.resolveNumber(storedUserProfile.userId),
+        username: this.resolveString(storedUserProfile.username),
+        fullName: this.resolveString(storedUserProfile.fullName) ?? 'Usuario',
+        role: this.resolveString(storedUserProfile.role) ?? 'Perfil activo',
+        companyId: this.resolveNumber(storedUserProfile.companyId)
+      };
+    }
+
+    const payload = session.accessToken ? this.decodeJwtPayload(session.accessToken) : null;
+
+    return this.resolveUserProfile({}, payload);
+  }
+
+  private resolveString(...values: Array<string | null | undefined>): string | null {
+    for (const value of values) {
+      if (typeof value === 'string' && value.trim()) {
+        return value.trim();
+      }
+    }
+
+    return null;
+  }
+
+  private resolveNumber(...values: Array<number | null | undefined>): number | null {
+    for (const value of values) {
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        return value;
+      }
+    }
+
+    return null;
+  }
+
+  private getAnonymousUserProfile(): UserProfile {
+    return {
+      userId: null,
+      username: null,
+      fullName: 'Usuario',
+      role: 'Perfil activo',
+      companyId: null
+    };
   }
 }
