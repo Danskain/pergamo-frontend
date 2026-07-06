@@ -55,7 +55,6 @@ export class LegacyAuthBridgeService {
   }
 
   private readonly handleMessage = (event: MessageEvent<unknown>): void => {
-    console.log('TOKEN RECIBIDO:', (event.data as { access_token?: string })?.access_token);
     if (!this.allowedOrigins.has(event.origin)) {
       return;
     }

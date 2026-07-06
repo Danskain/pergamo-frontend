@@ -1,0 +1,1 @@
+import{a as r}from"./chunk-4WU6OK3B.js";var i=r.apiBaseUrl;function t(n){return n.replace(/\/+$/,"")}function o(){let n=globalThis.__env,e=n?.API_BASE_URL??n?.apiBaseUrl??i;return t(e)}export{o as a};

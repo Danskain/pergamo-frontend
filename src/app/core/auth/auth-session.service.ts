@@ -12,7 +12,7 @@ export interface PergamoAuthMessage {
   company_id?: number;
 }
 
-interface UserProfile {
+export interface AuthUserProfile {
   userId: number | null;
   username: string | null;
   fullName: string;
@@ -25,7 +25,7 @@ interface StoredAuthSession {
   tokenType: string;
   expiresIn: number | null;
   receivedAt: string;
-  userProfile: UserProfile | null;
+  userProfile: AuthUserProfile | null;
 }
 
 interface JwtPayload {
@@ -81,6 +81,10 @@ export class AuthSessionService {
     return this.getValidSession() !== null;
   }
 
+  getAccessToken(): string | null {
+    return this.getValidSession()?.accessToken ?? null;
+  }
+
   isAwaitingExternalAuth(): boolean {
     return this.awaitingExternalAuthState();
   }
@@ -100,6 +104,22 @@ export class AuthSessionService {
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem(AUTH_STORAGE_KEY);
     }
+  }
+
+  updateUserProfile(userProfile: AuthUserProfile): void {
+    const session = this.getValidSession();
+
+    if (!session) {
+      return;
+    }
+
+    const updatedSession: StoredAuthSession = {
+      ...session,
+      userProfile
+    };
+
+    this.sessionState.set(updatedSession);
+    this.persistSession(updatedSession);
   }
 
   isCurrentSessionExpired(): boolean {
@@ -204,7 +224,7 @@ export class AuthSessionService {
   private resolveUserProfile(
     message: Partial<PergamoAuthMessage>,
     payload: JwtPayload | null
-  ): UserProfile {
+  ): AuthUserProfile {
     return {
       userId: this.resolveNumber(message.user_id, payload?.user_id),
       username: this.resolveString(message.username, payload?.username),
@@ -215,7 +235,7 @@ export class AuthSessionService {
     };
   }
 
-  private restoreUserProfile(session: Partial<StoredAuthSession>): UserProfile {
+  private restoreUserProfile(session: Partial<StoredAuthSession>): AuthUserProfile {
     const storedUserProfile = session.userProfile;
 
     if (storedUserProfile) {
@@ -253,7 +273,7 @@ export class AuthSessionService {
     return null;
   }
 
-  private getAnonymousUserProfile(): UserProfile {
+  private getAnonymousUserProfile(): AuthUserProfile {
     return {
       userId: null,
       username: null,

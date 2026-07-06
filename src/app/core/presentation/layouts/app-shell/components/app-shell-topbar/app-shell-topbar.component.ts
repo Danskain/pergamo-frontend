@@ -9,7 +9,7 @@ import {
   NbUserModule
 } from '@nebular/theme';
 
-import { AuthSessionService } from '../../../../../auth/auth-session.service';
+import { AuthCurrentUserService } from '../../../../../auth/auth-current-user.service';
 
 type AppTheme = 'default' | 'dark';
 
@@ -28,14 +28,14 @@ type AppTheme = 'default' | 'dark';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppShellTopbarComponent {
-  private readonly authSession = inject(AuthSessionService);
+  private readonly authCurrentUser = inject(AuthCurrentUserService);
   private readonly themeService = inject(NbThemeService);
 
   readonly appName = input.required<string>();
   readonly menuToggle = output<void>();
   protected readonly notificationCount = 3;
-  protected readonly userName = computed(() => this.authSession.userProfile().fullName);
-  protected readonly userTitle = computed(() => this.authSession.userProfile().role);
+  protected readonly userName = computed(() => this.authCurrentUser.userProfile().fullName);
+  protected readonly userTitle = computed(() => this.authCurrentUser.userProfile().role);
   protected readonly isDarkMode = signal(this.getStoredTheme() === 'dark');
 
   constructor() {
