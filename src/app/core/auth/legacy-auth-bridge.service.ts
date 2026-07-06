@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, NgZone, inject } from '@angular/core';
 
 import { AuthSessionService, PergamoAuthMessage } from './auth-session.service';
 import { LegacyLogoutRedirectService } from './legacy-logout-redirect.service';
@@ -8,6 +8,7 @@ import { resolveLegacyAppOrigins } from './runtime-auth-config';
 export class LegacyAuthBridgeService {
   private readonly authSession = inject(AuthSessionService);
   private readonly legacyLogoutRedirect = inject(LegacyLogoutRedirectService);
+  private readonly ngZone = inject(NgZone);
   private readonly allowedOrigins = new Set(resolveLegacyAppOrigins());
   private readonly handshakeTimeoutMs = 1500;
 
@@ -64,8 +65,12 @@ export class LegacyAuthBridgeService {
       return;
     }
 
-    this.authSession.saveFromMessage(event.data);
-    this.finishInitialization?.();
+    const authMessage = event.data;
+
+    this.ngZone.run(() => {
+      this.authSession.saveFromMessage(authMessage);
+      this.finishInitialization?.();
+    });
   };
 
   private isPergamoAuthMessage(value: unknown): value is PergamoAuthMessage {
