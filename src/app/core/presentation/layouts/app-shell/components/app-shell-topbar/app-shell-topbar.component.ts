@@ -36,6 +36,20 @@ export class AppShellTopbarComponent {
   protected readonly notificationCount = 3;
   protected readonly userName = computed(() => this.authSession.userProfile().fullName);
   protected readonly userTitle = computed(() => this.authSession.userProfile().role);
+  protected readonly userInitials = computed(() => {
+    const fullName = this.userName().trim();
+
+    if (!fullName) {
+      return 'U';
+    }
+
+    return fullName
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join('');
+  });
   protected readonly isDarkMode = signal(this.getStoredTheme() === 'dark');
 
   constructor() {

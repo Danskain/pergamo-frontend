@@ -32,15 +32,22 @@
         ></nb-badge>
     </button>
 
+    <div class="user-profile">
+      <div class="user-profile-text">
+        <span class="user-profile-name">{{ userName() }}</span>
+        <span class="user-profile-role">{{ userTitle() }}</span>
+      </div>
 
-    <nb-user
-      [name]="userName()"
-      [title]="userTitle()"
-      badgePosition="bottom right"
-      badgeStatus="success"
-      color="#3366ff"
-      shape="round"
-      size="large"
-    ></nb-user>
+      <nb-user
+        [name]="userInitials()"
+        [title]="''"
+        [onlyPicture]="true"
+        badgePosition="bottom right"
+        badgeStatus="success"
+        color="#3366ff"
+        shape="round"
+        size="large"
+      ></nb-user>
+    </div>
   </div>
 </div>
