@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import {
   NbBadgeModule,
   NbButtonModule,
@@ -36,44 +36,10 @@ export class AppShellTopbarComponent {
   protected readonly notificationCount = 3;
   protected readonly userName = computed(() => this.authSession.userProfile().fullName);
   protected readonly userTitle = computed(() => this.authSession.userProfile().role);
-  protected readonly userInitials = computed(() => {
-    const fullName = this.userName().trim();
-
-    if (!fullName) {
-      return 'U';
-    }
-
-    return fullName
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part.charAt(0).toUpperCase())
-      .join('');
-  });
   protected readonly isDarkMode = signal(this.getStoredTheme() === 'dark');
 
   constructor() {
     this.applyTheme(this.isDarkMode() ? 'dark' : 'default');
-    // #region debug-point D:topbar-profile-effect
-    effect(() => {
-      fetch('http://127.0.0.1:7777/event', {
-        method: 'POST',
-        body: JSON.stringify({
-          sessionId: 'topbar-token-sync',
-          runId: 'pre-fix',
-          hypothesisId: 'D',
-          location: 'app-shell-topbar.component.ts:56',
-          msg: '[DEBUG] topbar profile snapshot',
-          data: {
-            userName: this.userName(),
-            userTitle: this.userTitle(),
-            userInitials: this.userInitials()
-          },
-          ts: Date.now()
-        })
-      }).catch(() => {});
-    });
-    // #endregion
   }
 
   protected onMenuToggle(): void {

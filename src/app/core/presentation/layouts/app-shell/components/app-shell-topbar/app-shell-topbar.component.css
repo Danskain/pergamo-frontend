@@ -50,34 +50,6 @@
   }
 }
 
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.user-profile-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  min-width: 0;
-}
-
-.user-profile-name,
-.user-profile-role {
-  line-height: 1.1;
-  white-space: nowrap;
-}
-
-.user-profile-name {
-  font-weight: 600;
-}
-
-.user-profile-role {
-  font-size: 0.85rem;
-  opacity: 0.8;
-}
-
 /* -------------------------------- */
 /* Responsive */
 /* -------------------------------- */
@@ -102,10 +74,6 @@
 
   .topbar-right {
     gap: 0;
-  }
-
-  .user-profile-text {
-    display: none;
   }
 
 }
