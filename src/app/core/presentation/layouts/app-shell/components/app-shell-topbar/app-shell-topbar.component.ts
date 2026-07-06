@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import {
   NbBadgeModule,
   NbButtonModule,
@@ -54,6 +54,26 @@ export class AppShellTopbarComponent {
 
   constructor() {
     this.applyTheme(this.isDarkMode() ? 'dark' : 'default');
+    // #region debug-point D:topbar-profile-effect
+    effect(() => {
+      fetch('http://127.0.0.1:7777/event', {
+        method: 'POST',
+        body: JSON.stringify({
+          sessionId: 'topbar-token-sync',
+          runId: 'pre-fix',
+          hypothesisId: 'D',
+          location: 'app-shell-topbar.component.ts:56',
+          msg: '[DEBUG] topbar profile snapshot',
+          data: {
+            userName: this.userName(),
+            userTitle: this.userTitle(),
+            userInitials: this.userInitials()
+          },
+          ts: Date.now()
+        })
+      }).catch(() => {});
+    });
+    // #endregion
   }
 
   protected onMenuToggle(): void {

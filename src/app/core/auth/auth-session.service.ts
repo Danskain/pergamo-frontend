@@ -63,6 +63,25 @@ export class AuthSessionService {
     };
 
     this.sessionState.set(normalizedSession);
+    // #region debug-point C:session-saved
+    fetch('http://127.0.0.1:7777/event', {
+      method: 'POST',
+      body: JSON.stringify({
+        sessionId: 'topbar-token-sync',
+        runId: 'pre-fix',
+        hypothesisId: 'C',
+        location: 'auth-session.service.ts:68',
+        msg: '[DEBUG] session saved from message',
+        data: {
+          fullName: normalizedSession.userProfile?.fullName ?? null,
+          role: normalizedSession.userProfile?.role ?? null,
+          hasToken: Boolean(normalizedSession.accessToken),
+          expiresIn: normalizedSession.expiresIn
+        },
+        ts: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
     this.awaitingExternalAuthState.set(false);
     this.persistSession(normalizedSession);
   }
