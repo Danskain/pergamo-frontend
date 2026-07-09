@@ -57,6 +57,20 @@ export class AuthCurrentUserService {
     });
   }
 
+  refreshCurrentUser(force = false): void {
+    const accessToken = this.authSession.getAccessToken();
+
+    if (!accessToken) {
+      return;
+    }
+
+    if (!force && this.loadedTokenState() === accessToken) {
+      return;
+    }
+
+    this.loadCurrentUser(accessToken);
+  }
+
   private loadCurrentUser(accessToken: string): void {
     this.cancelActiveRequest();
 
